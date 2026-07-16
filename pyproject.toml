@@ -41,7 +41,7 @@ dependencies = [
 cwl2puml = "cwl2puml.cli:main"
 
 [project.urls]
-Documentation = "https://github.com/Terradue/cwl2puml#readme"
+Documentation = "https://terradue.github.io/cwl2puml/"
 Issues = "https://github.com/Terradue/cwl2puml/issues"
 Source = "https://github.com/Terradue/cwl2puml"
 

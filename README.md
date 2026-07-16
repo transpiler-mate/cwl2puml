@@ -1,5 +1,8 @@
 # cwl2puml
 
+[![PyPI - Version](https://img.shields.io/pypi/v/cwl2puml.svg)](https://pypi.org/project/cwl2puml)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cwl2puml.svg)](https://pypi.org/project/cwl2puml)
+
 `cwl2puml` converts [Common Workflow Language](https://www.commonwl.org/) workflows into [PlantUML](https://plantuml.com/) diagrams.
 
 It provides a CLI that can:
@@ -127,4 +130,4 @@ Open an issue at https://github.com/Terradue/cwl2puml/issues if you find a bug o
 
 ## License
 
-This project is licensed under the MIT License. See [`LICENSE`](/data/work/github-terradue/cwl2puml/LICENSE).
+[![Apache License, Version 2.0](https://img.shields.io/badge/license-Apache%20License%202.0-blue)](https://www.apache.org/licenses/LICENSE-2.0)

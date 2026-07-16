@@ -11,3 +11,8 @@ updates:
       - "dependencies"
     allow:
       - dependency-type: "direct"
+    ignore:
+      # cwl-loader 0.20.0 and cwl2ogc 0.18.0 require cwl-utils==0.41.
+      - dependency-name: "cwl-utils"
+        versions:
+          - ">=0.42"
