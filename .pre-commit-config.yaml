@@ -1,0 +1,67 @@
+# Copyright 2025 Terradue
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+minimum_pre_commit_version: "3.5.0"
+
+# Hatch owns the tool versions and project dependencies. The hooks only invoke
+# the corresponding project scripts, avoiding duplicated dependency lists.
+repos:
+- repo: local
+  hooks:
+  - id: mypy
+    name: mypy (strict type checking)
+    entry: hatch run dev:typecheck
+    language: system
+    types_or:
+    - python
+    - pyi
+    pass_filenames: false
+    always_run: true
+
+  - id: ruff-format
+    name: ruff (format)
+    entry: hatch run dev:lint
+    language: system
+    types_or:
+    - python
+    - pyi
+    pass_filenames: false
+    always_run: true
+
+  - id: ruff
+    name: ruff (check and McCabe complexity)
+    entry: hatch run dev:check
+    language: system
+    types_or:
+    - python
+    - pyi
+    pass_filenames: false
+    always_run: true
+
+  - id: bandit
+    name: bandit (find common security issues)
+    entry: hatch run dev:security
+    language: system
+    types_or:
+    - python
+    - pyi
+    pass_filenames: false
+    always_run: true
+
+  - id: pytest
+    name: pytest
+    entry: hatch run test:test
+    language: system
+    pass_filenames: false
+    always_run: true

@@ -27,7 +27,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "cwl-loader==0.20.0",
+  "cwl-loader==0.21.0",
   "cwltool==3.1.20260315121657",
   "cwl-utils==0.41",
   "click==8.4.1",
@@ -76,30 +76,81 @@ exclude_lines = [
 
 [tool.hatch.envs.test]
 skip-install = false
-
 dependencies = [
-  "pytest==9.0.2",
-  "pytest-cov==7.0.0",
+  "pytest>=8.4,<10",
+  "pytest-cov>=6.2,<8",
 ]
 
 [tool.hatch.envs.test.scripts]
-test = "pytest"
-test-q = "pytest -q"
-test-cov = "pytest --cov=cwl2puml --cov-report=xml --cov-report=html"
+test = "pytest {args:tests}"
+testv = "pytest --verbose {args:tests}"
+test-cov = "pytest --cov=cwl2puml --cov-report=term-missing {args:tests}"
 test-show-setup = "pytest --setup-show"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+  "--strict-config",
+  "--strict-markers",
+]
 
 [[tool.hatch.envs.test.matrix]]
 python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
 
+[tool.hatch.envs.default]
+skip-install = false
+
 [tool.hatch.envs.dev]
-description = "Development environment"
+skip-install = false
 dependencies = [
-  "pytest==9.0.2",
-  "ruff==0.14.6",
+  "mypy>=2.3.0",
+  "ruff>=0.16.0",
+  "bandit>=1.9.4",
 ]
 
+[tool.ruff.lint]
+# Start with the essential rules
+select = [
+  "F",    # Pyflakes (Critical for bugs)
+  "E",    # pycodestyle Errors
+  "W",    # pycodestyle Warnings
+  "I",    # isort (Import sorting)
+  "UP",   # pyupgrade (Modern syntax)
+  "B",    # flake8-bugbear (Common bugs)
+  "C4",   # flake8-comprehensions
+  "SIM",  # flake8-simplify
+  "FA",   # flake8-future-annotations
+  "TC",   # flake8-type-checking
+  "PTH",  # flake8-use-pathlib
+  "RET",  # flake8-return
+  "C90",  # McCabe Complexity (Enables C901)
+]
+
+# Ignore rules that conflict with the formatter (Ruff Format/Black)
+ignore = [
+  "E501", # Line too long (handled by formatter)
+  "W191", # Tab indentation (handled by formatter)
+  "E111", # Indentation issues (handled by formatter)
+  "E114", # Indentation issues (handled by formatter)
+  "E117", # Over-indented (handled by formatter)
+]
+
+[tool.ruff.lint.mccabe]
+# Flag errors (C901) whenever complexity exceeds 10 (default is 10)
+max-complexity = 10
 
 [tool.hatch.envs.dev.scripts]
-lint = "ruff format src tests"
-check = "ruff check --fix src tests"
+typecheck = "mypy --install-types --non-interactive {args:src tests}"
+lint = "ruff format {args:src tests}"
+check = "ruff check --fix {args:src tests}"
+security = "bandit -r {args:src}"
+
+[[tool.mypy.overrides]]
+module = [
+  "cwl2ogc",
+  "cwl_loader",
+  "cwl_loader.*",
+  "plantuml",
+]
+ignore_missing_imports = true
