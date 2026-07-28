@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.45.0] - 2026-07-28
+
+### Changed
+
+- Bumped `cwl-loader` from `0.16.0` to `0.21.0`.
+
+### Added
+
+- Stronger code chekers with Ruff+McCabe & Bandit
+
 ## [0.44.0] - 2026-06-16
 
 ### Changed

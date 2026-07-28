@@ -12,19 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cwl2ogc import BaseCWLtypes2OGCConverter
-from cwl_loader.utils import assert_connected_graph, assert_process_contained, to_index
-from cwl_utils.parser import Process
-from datetime import datetime
-from enum import auto, Enum
-from importlib.metadata import version, PackageNotFoundError
-from jinja2 import Environment, PackageLoader
-
-from typing import Any, List, Mapping, Union, TextIO, get_args, get_origin
-
 import json
 import re
 import time
+from collections.abc import Mapping
+from datetime import datetime
+from enum import Enum, auto
+from importlib.metadata import PackageNotFoundError, version
+from types import UnionType
+from typing import Any, TextIO, Union, get_args, get_origin
+
+from cwl2ogc import BaseCWLtypes2OGCConverter
+from cwl_loader.utils import assert_connected_graph, assert_process_contained, to_index
+from cwl_utils.parser import Process
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 
 def _a_string(typ: Any) -> bool:
@@ -91,7 +92,7 @@ def _to_puml_name(identifier: str) -> str:
 
 
 def _type_to_ref(id: str, typ: Any) -> str:
-    if get_origin(typ) is Union:
+    if get_origin(typ) in (Union, UnionType):
         return "\n".join([_type_to_ref(id, inner_type) for inner_type in get_args(typ)])
 
     if _a_list(typ):
@@ -117,7 +118,7 @@ def _type_to_ref(id: str, typ: Any) -> str:
 
 
 def _type_to_string(id: str, typ: Any) -> str:
-    if get_origin(typ) is Union:
+    if get_origin(typ) in (Union, UnionType):
         return " | ".join(
             [_type_to_string(id, inner_type) for inner_type in get_args(typ)]
         )
@@ -167,8 +168,8 @@ def get_ogc_outputs(process: Process):
     return _dump_json(BaseCWLtypes2OGCConverter(process).get_outputs())
 
 
-def _to_mapping(functions: List[Any]) -> Mapping[str, Any]:
-    mapping: Mapping[str, Any] = {}
+def _to_mapping(functions: list[Any]) -> dict[str, Any]:
+    mapping: dict[str, Any] = {}
 
     for function in functions:
         name = function.__name__
@@ -177,7 +178,14 @@ def _to_mapping(functions: List[Any]) -> Mapping[str, Any]:
     return mapping
 
 
-_jinja_environment = Environment(loader=PackageLoader(package_name="cwl2puml"))
+_jinja_environment = Environment(
+    autoescape=select_autoescape(
+        disabled_extensions=("puml",),
+        default_for_string=False,
+        default=False,
+    ),
+    loader=PackageLoader(package_name="cwl2puml"),
+)
 
 for key, value in _to_mapping(
     [_type_to_ref, _type_to_string, get_ogc_inputs, get_ogc_outputs]
@@ -203,7 +211,7 @@ _jinja_environment.tests.update(
 
 
 def to_puml(
-    cwl_document: Process | List[Process],
+    cwl_document: Process | list[Process],
     diagram_type: DiagramType,
     output_stream: TextIO,
     workflow_id: str = "main",

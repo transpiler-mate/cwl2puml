@@ -12,26 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cwl_loader import load_cwl_from_location
-from cwl_utils.parser import Process
-import cwl2puml
-import cwl2puml.cli as cli
+from __future__ import annotations
 
-from cwl2puml import DiagramType, to_puml
 from importlib.metadata import PackageNotFoundError
 from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
-from typing import List, Union
+from typing import TYPE_CHECKING
 from unittest import TestCase
 from unittest.mock import patch
+
 from click.testing import CliRunner
+from cwl_loader import load_cwl_from_location
+
+import cwl2puml
+import cwl2puml.cli as cli
+from cwl2puml import DiagramType, to_puml
+
+if TYPE_CHECKING:
+    from cwl_utils.parser import Process
 
 
 class Testloading(TestCase):
     def setUp(self):
-        self.graph: Process | List[Process] = load_cwl_from_location(
+        self.graph: Process | list[Process] = load_cwl_from_location(
             path="https://raw.githubusercontent.com/eoap/application-package-patterns/refs/heads/main/cwl-workflow/pattern-1.cwl"
         )
 
@@ -87,7 +92,7 @@ class TestHelpers(TestCase):
         )
 
     def test_type_to_string_with_union(self):
-        rendered = cwl2puml._type_to_string("test_id", Union[str, int])
+        rendered = cwl2puml._type_to_string("test_id", str | int)
         self.assertEqual(rendered, "str | int")
 
     def test_type_to_string_with_list(self):
@@ -358,7 +363,7 @@ class TestCli(TestCase):
             self.assertEqual(result.exit_code, 0, result.output)
             encode_mock.assert_called_once()
             get_mock.assert_called_once_with(
-                "https://uml.planttext.com/plantuml/svg/encoded-diagram"
+                "https://uml.planttext.com/plantuml/svg/encoded-diagram", timeout=30
             )
             self.assertEqual(target.read_bytes(), b"svg-data")
 

@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import DiagramType, to_puml
-from cwl_loader import load_cwl_from_location
+import time
 from datetime import datetime
-from enum import auto, Enum
+from enum import Enum, auto
 from http import HTTPStatus
 from io import StringIO
-from loguru import logger
 from pathlib import Path
-from plantuml import deflate_and_encode
-from typing import List
 
 import click
 import requests
-import time
+from cwl_loader import load_cwl_from_location
+from loguru import logger
+from plantuml import deflate_and_encode
+
+from . import DiagramType, to_puml
 
 
 class ImageFormat(Enum):
@@ -77,7 +77,7 @@ class ImageFormat(Enum):
 def main(
     workflow: str,
     workflow_id: str,
-    diagrams: List[DiagramType],
+    diagrams: list[DiagramType],
     output: Path,
     convert_image: bool,
     puml_server: str,
@@ -139,7 +139,7 @@ def main(
 
                 encoded = deflate_and_encode(clear_output)
                 diagram_url = f"https://{puml_server}/plantuml/{image_format.name.lower()}/{encoded}"
-                response = requests.get(diagram_url)
+                response = requests.get(diagram_url, timeout=30)
                 if HTTPStatus.OK.value == response.status_code:
                     target = Path(
                         output,

@@ -34,9 +34,19 @@ permissions:
   contents: read
 
 jobs:
-  ci:
-    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/')
+  build:
+    if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - '3.10'
+        - '3.11'
+        - '3.12'
+        - '3.13'
+        - '3.14'
+
     steps:
     - uses: actions/checkout@v4
 
@@ -47,16 +57,22 @@ jobs:
         cache: pip
 
     - name: Install tooling
-      run: pip install hatch ruff
+      run: pip install hatch
 
-    - name: Ruff Check
-      run: ruff check src tests
+    - name: mypy (strict type checking)
+      run: hatch run dev:typecheck
 
-    - name: Ruff Lint
-      run: ruff format --check src tests
+    - name: ruff (format)
+      run: hatch run dev:lint
 
-    - name: Run tests
-      run: hatch run test:test-q
+    - name: ruff (check and McCabe complexity)
+      run: hatch run dev:check
+
+    - name: bandit (find common security issues)
+      run: hatch run dev:security
+
+    - name: pytest (test coverage)
+      run: hatch run test:test-cov
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')

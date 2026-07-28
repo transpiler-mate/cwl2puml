@@ -9,3 +9,5 @@ __pycache__
 docs/api
 .ruff_cache/
 .pytest_cache/
+.mypy_cache
+uv.lock
