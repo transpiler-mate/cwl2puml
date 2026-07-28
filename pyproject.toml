@@ -27,14 +27,13 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "cwl-loader==0.21.0",
-  "cwltool==3.1.20260315121657",
-  "cwl-utils==0.41",
-  "click==8.4.1",
+  "cwl-loader==0.23.0",
+  "cwl-utils==0.42",
+  "click==8.4.2",
   "Jinja2==3.1.6",
   "loguru==0.7.3",
   "plantuml==0.3.0",
-  "cwl2ogc==0.18.0"
+  "cwl2ogc==0.19.0"
 ]
 
 [project.scripts]
@@ -47,13 +46,6 @@ Source = "https://github.com/Terradue/cwl2puml"
 
 [tool.hatch.version]
 path = "src/cwl2puml/__about__.py"
-
-[tool.hatch.envs.types]
-extra-dependencies = [
-  "mypy==1.0.0",
-]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/cwl2puml tests}"
 
 [tool.coverage.run]
 source_pkgs = ["cwl2puml", "tests"]
@@ -79,6 +71,7 @@ skip-install = false
 dependencies = [
   "pytest>=8.4,<10",
   "pytest-cov>=6.2,<8",
+  "cwltool>=3.2.20260720092025"
 ]
 
 [tool.hatch.envs.test.scripts]

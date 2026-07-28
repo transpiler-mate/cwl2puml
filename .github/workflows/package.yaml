@@ -53,11 +53,36 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
-        cache: pip
+        python-version: ${{ matrix.python-version }}
+        cache: "pip"
 
     - name: Install tooling
       run: pip install hatch
+
+    # -----------------------------
+    # Strict SemVer + Hatch version gate
+    # -----------------------------
+    - name: Validate tag and hatch version
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        TAG="${GITHUB_REF#refs/tags/}"
+
+        # Ensure tag starts with v
+        if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "ERROR: Tag must follow strict SemVer format vX.Y.Z"
+          exit 1
+        fi
+
+        TAG_VERSION="${TAG#v}"
+        HATCH_VERSION=$(hatch version)
+
+        echo "Tag version:   $TAG_VERSION"
+        echo "Hatch version: $HATCH_VERSION"
+
+        if [ "$TAG_VERSION" != "$HATCH_VERSION" ]; then
+          echo "ERROR: Git tag version does not match hatch version"
+          exit 1
+        fi
 
     - name: mypy (strict type checking)
       run: hatch run dev:typecheck
@@ -76,6 +101,7 @@ jobs:
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
     runs-on: ubuntu-latest
     environment: release
     permissions:

@@ -19,11 +19,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.46.0] - 2026-07-28
+
+### Changed
+
+- Bumped `cwl-loader` to `0.23.0`.
+- Bumped `cwl-utils` to `0.42`.
+- Bumped `click` to `8.4.2`
+- Bumped `cwl2ogc` to `0.19.0`
+
+### Removed
+
+- `cwltool` is now useless.
+
 ## [0.45.0] - 2026-07-28
 
 ### Changed
 
-- Bumped `cwl-loader` from `0.16.0` to `0.21.0`.
+- Bumped `cwl-loader` to `0.21.0`.
 
 ### Added
 
@@ -146,7 +159,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed identifier escaping so characters such as `.` do not corrupt PlantUML identifiers.
 - Fixed enum string rendering and Python doc generation issues.
 
-[unreleased]: https://github.com/Terradue/cwl2puml/compare/v0.43.0...HEAD
+[unreleased]: https://github.com/Terradue/cwl2puml/compare/v0.46.0...HEAD
+[0.46.0]: https://github.com/Terradue/cwl2puml/compare/v0.45.0...v0.46.0
+[0.45.0]: https://github.com/Terradue/cwl2puml/compare/v0.44.0...v0.45.0
+[0.44.0]: https://github.com/Terradue/cwl2puml/compare/v0.43.0...v0.44.0
 [0.43.0]: https://github.com/Terradue/cwl2puml/compare/v0.42.0...v0.43.0
 [0.42.0]: https://github.com/Terradue/cwl2puml/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/Terradue/cwl2puml/compare/v0.40.0...v0.41.0
