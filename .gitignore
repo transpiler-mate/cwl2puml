@@ -11,3 +11,4 @@ docs/api
 .pytest_cache/
 .mypy_cache
 uv.lock
+.vscode

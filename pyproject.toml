@@ -27,17 +27,25 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "cwl-loader==0.24.0",
+  "cwl2ogc>=0.19.0",
   "cwl-utils==0.42",
-  "click==8.4.2",
   "Jinja2==3.1.6",
   "loguru==0.7.3",
   "plantuml==0.3.0",
-  "cwl2ogc==0.19.0"
+  "requests"
 ]
 
-[project.scripts]
-cwl2puml = "cwl2puml.cli:main"
+[project.optional-dependencies]
+transpiler-mate-api = [
+  "transpiler-mate-api @ git+https://github.com/sim13pods/transpiler-mate-api.git@main",
+]
+
+# TODO remove me as soon as transpiler-mate-api is on PyPI
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[project.entry-points."transpiler_mate.plugins"]
+cwl2puml = "cwl2puml.plugin:cwl2puml"
 
 [project.urls]
 Documentation = "https://terradue.github.io/cwl2puml/"
@@ -68,7 +76,9 @@ exclude_lines = [
 
 [tool.hatch.envs.test]
 skip-install = false
+features = ["transpiler-mate-api"]
 dependencies = [
+  "cwl-loader==0.24.0",
   "pytest>=8.4,<10",
   "pytest-cov>=6.2,<8",
   "cwltool>=3.2.20260720092025"
@@ -97,6 +107,7 @@ skip-install = false
 [tool.hatch.envs.dev]
 skip-install = false
 dependencies = [
+  "transpiler-mate-api @ git+https://github.com/sim13pods/transpiler-mate-api.git@main",
   "mypy>=2.3.0",
   "ruff>=0.16.0",
   "bandit>=1.9.4",

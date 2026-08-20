@@ -211,7 +211,7 @@ _jinja_environment.tests.update(
 
 
 def to_puml(
-    cwl_document: Process | list[Process],
+    cwl_document: Process | list[Process] | tuple[Process, ...],
     diagram_type: DiagramType,
     output_stream: TextIO,
     workflow_id: str = "main",

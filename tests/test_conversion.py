@@ -23,12 +23,13 @@ from typing import TYPE_CHECKING
 from unittest import TestCase
 from unittest.mock import patch
 
-from click.testing import CliRunner
 from cwl_loader import load_cwl_from_location
+from transpiler_mate.api import PluginExecutionError, PluginFailureError
 
 import cwl2puml
-import cwl2puml.cli as cli
 from cwl2puml import DiagramType, to_puml
+from cwl2puml.plugin import Cwl2PumlOptions, ImageFormat
+from cwl2puml.plugin import cwl2puml as plugin
 
 if TYPE_CHECKING:
     from cwl_utils.parser import Process
@@ -289,15 +290,16 @@ class TestHelpers(TestCase):
         )
 
 
-class TestCli(TestCase):
+class TestPlugin(TestCase):
     def setUp(self):
-        self.runner = CliRunner()
+        self.context = SimpleNamespace(
+            document=object(), resolved_process=SimpleNamespace(id="main")
+        )
 
-    def test_main_writes_puml_output(self):
+    def test_plugin_writes_puml_output(self):
         with (
             TemporaryDirectory() as tmpdir,
-            patch("cwl2puml.cli.load_cwl_from_location", return_value=object()),
-            patch("cwl2puml.cli.to_puml") as to_puml_mock,
+            patch("cwl2puml.plugin.to_puml") as to_puml_mock,
         ):
             target = Path(tmpdir, "component.puml")
             to_puml_mock.side_effect = (
@@ -306,36 +308,32 @@ class TestCli(TestCase):
                 )
             )
 
-            result = self.runner.invoke(
-                cli.main,
-                [
-                    "workflow.cwl",
-                    "--workflow-id",
-                    "main",
-                    "--diagrams",
-                    "component",
-                    "--output",
-                    tmpdir,
-                ],
+            plugin.execute(
+                self.context,
+                Cwl2PumlOptions(diagrams=[DiagramType.COMPONENT], output=Path(tmpdir)),
             )
 
-            self.assertEqual(result.exit_code, 0, result.output)
             self.assertTrue(target.exists())
             self.assertIn("@startuml", target.read_text())
+            to_puml_mock.assert_called_once_with(
+                cwl_document=self.context.document,
+                workflow_id="main",
+                diagram_type=DiagramType.COMPONENT,
+                output_stream=to_puml_mock.call_args.kwargs["output_stream"],
+            )
 
-    def test_main_writes_image_output_when_requested(self):
+    def test_plugin_writes_image_output_when_requested(self):
         response = type(
             "Response", (), {"status_code": 200, "content": b"svg-data", "reason": "OK"}
         )()
 
         with (
             TemporaryDirectory() as tmpdir,
-            patch("cwl2puml.cli.load_cwl_from_location", return_value=object()),
-            patch("cwl2puml.cli.to_puml") as to_puml_mock,
+            patch("cwl2puml.plugin.to_puml") as to_puml_mock,
             patch(
-                "cwl2puml.cli.deflate_and_encode", return_value="encoded-diagram"
+                "cwl2puml.plugin.deflate_and_encode", return_value="encoded-diagram"
             ) as encode_mock,
-            patch("cwl2puml.cli.requests.get", return_value=response) as get_mock,
+            patch("cwl2puml.plugin.requests.get", return_value=response) as get_mock,
         ):
             target = Path(tmpdir, "component.svg")
             to_puml_mock.side_effect = (
@@ -344,30 +342,23 @@ class TestCli(TestCase):
                 )
             )
 
-            result = self.runner.invoke(
-                cli.main,
-                [
-                    "workflow.cwl",
-                    "--workflow-id",
-                    "main",
-                    "--diagrams",
-                    "component",
-                    "--output",
-                    tmpdir,
-                    "--convert-image",
-                    "--image-format",
-                    "svg",
-                ],
+            plugin.execute(
+                self.context,
+                Cwl2PumlOptions(
+                    diagrams=[DiagramType.COMPONENT],
+                    output=Path(tmpdir),
+                    convert_image=True,
+                    image_format=ImageFormat.SVG,
+                ),
             )
 
-            self.assertEqual(result.exit_code, 0, result.output)
             encode_mock.assert_called_once()
             get_mock.assert_called_once_with(
                 "https://uml.planttext.com/plantuml/svg/encoded-diagram", timeout=30
             )
             self.assertEqual(target.read_bytes(), b"svg-data")
 
-    def test_main_skips_image_file_on_render_error(self):
+    def test_plugin_raises_execution_error_on_render_error(self):
         response = type(
             "Response",
             (),
@@ -376,10 +367,9 @@ class TestCli(TestCase):
 
         with (
             TemporaryDirectory() as tmpdir,
-            patch("cwl2puml.cli.load_cwl_from_location", return_value=object()),
-            patch("cwl2puml.cli.to_puml") as to_puml_mock,
-            patch("cwl2puml.cli.deflate_and_encode", return_value="encoded-diagram"),
-            patch("cwl2puml.cli.requests.get", return_value=response),
+            patch("cwl2puml.plugin.to_puml") as to_puml_mock,
+            patch("cwl2puml.plugin.deflate_and_encode", return_value="encoded-diagram"),
+            patch("cwl2puml.plugin.requests.get", return_value=response),
         ):
             target = Path(tmpdir, "component.png")
             to_puml_mock.side_effect = (
@@ -388,42 +378,39 @@ class TestCli(TestCase):
                 )
             )
 
-            result = self.runner.invoke(
-                cli.main,
-                [
-                    "workflow.cwl",
-                    "--workflow-id",
-                    "main",
-                    "--diagrams",
-                    "component",
-                    "--output",
-                    tmpdir,
-                    "--convert-image",
-                ],
-            )
+            with self.assertRaises(PluginExecutionError):
+                plugin.execute(
+                    self.context,
+                    Cwl2PumlOptions(
+                        diagrams=[DiagramType.COMPONENT],
+                        output=Path(tmpdir),
+                        convert_image=True,
+                    ),
+                )
 
-            self.assertEqual(result.exit_code, 0, result.output)
             self.assertFalse(target.exists())
 
-    def test_main_catches_conversion_exceptions(self):
+    def test_plugin_propagates_conversion_exceptions(self):
         with (
             TemporaryDirectory() as tmpdir,
-            patch("cwl2puml.cli.load_cwl_from_location", return_value=object()),
-            patch("cwl2puml.cli.to_puml", side_effect=RuntimeError("boom")),
+            patch("cwl2puml.plugin.to_puml", side_effect=RuntimeError("boom")),
         ):
             target = Path(tmpdir, "component.puml")
-            result = self.runner.invoke(
-                cli.main,
-                [
-                    "workflow.cwl",
-                    "--workflow-id",
-                    "main",
-                    "--diagrams",
-                    "component",
-                    "--output",
-                    tmpdir,
-                ],
-            )
+            with self.assertRaisesRegex(RuntimeError, "boom"):
+                plugin.execute(
+                    self.context,
+                    Cwl2PumlOptions(
+                        diagrams=[DiagramType.COMPONENT], output=Path(tmpdir)
+                    ),
+                )
 
-            self.assertEqual(result.exit_code, 0, result.output)
             self.assertFalse(target.exists())
+
+    def test_plugin_requires_a_resolved_process(self):
+        context = SimpleNamespace(document=object(), resolved_process=None)
+
+        with (
+            TemporaryDirectory() as tmpdir,
+            self.assertRaises(PluginFailureError),
+        ):
+            plugin.execute(context, Cwl2PumlOptions(output=Path(tmpdir)))
