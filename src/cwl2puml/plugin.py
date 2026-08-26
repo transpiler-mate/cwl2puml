@@ -51,7 +51,7 @@ class Cwl2PumlOptions(BaseModel):
         description="The PlantUML diagram to serialize (all the supported kinds, by default).",
     )
 
-    output: Path = Field(description="Output directory path")
+    output: Path = Field(default=Path("./docs"), description="Output directory path")
     convert_image: bool = Field(
         default=False, description="Flag to turn on/off the image generation."
     )
