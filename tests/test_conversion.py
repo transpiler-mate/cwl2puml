@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from importlib.metadata import PackageNotFoundError
 from io import StringIO
 from pathlib import Path
@@ -24,7 +25,8 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from cwl_loader import load_cwl_from_location
-from transpiler_mate.api import PluginExecutionError, PluginFailureError
+from cwl_loader.utils import to_index
+from transpiler_mate.api import PluginExecutionError
 
 import cwl2puml
 from cwl2puml import DiagramType, to_puml
@@ -37,14 +39,16 @@ if TYPE_CHECKING:
 
 class Testloading(TestCase):
     def setUp(self):
-        self.graph: Process | list[Process] = load_cwl_from_location(
-            path="https://raw.githubusercontent.com/eoap/application-package-patterns/refs/heads/main/cwl-workflow/pattern-1.cwl"
+        self.graph: Mapping[str, Process] = to_index(
+            load_cwl_from_location(
+                path="https://raw.githubusercontent.com/eoap/application-package-patterns/refs/heads/main/cwl-workflow/pattern-1.cwl"
+            )
         )
 
     def _test_diagram(self, diagram_type: DiagramType):
         self.assertIsNotNone(self.graph, "Expected non null $graph, found None")
         self.assertIsInstance(
-            self.graph, list, f"Expecting graph as list, found {type(self.graph)}"
+            self.graph, Mapping, f"Expecting graph as mapping, found {type(self.graph)}"
         )
 
         out = StringIO()
@@ -143,7 +147,7 @@ class TestHelpers(TestCase):
         )
 
     def test_to_puml_renders_single_process_documents(self):
-        fake_document = object()
+        fake_document = {"main": object()}
         fake_template = type(
             "FakeTemplate",
             (),
@@ -156,8 +160,6 @@ class TestHelpers(TestCase):
         output = StringIO()
 
         with (
-            patch("cwl2puml.assert_process_contained") as assert_process_contained,
-            patch("cwl2puml.assert_connected_graph") as assert_connected_graph,
             patch("cwl2puml._get_version", return_value="1.2.3"),
             patch.object(
                 cwl2puml._jinja_environment, "get_template", return_value=fake_template
@@ -170,10 +172,6 @@ class TestHelpers(TestCase):
                 output_stream=output,
             )
 
-        assert_process_contained.assert_called_once_with(
-            process=fake_document, process_id="main"
-        )
-        assert_connected_graph.assert_called_once_with(fake_document)
         self.assertEqual(output.getvalue(), "main|1.2.3")
 
     def test_sequence_diagram_qualifies_reused_subworkflow_aliases(self):
@@ -243,30 +241,15 @@ class TestHelpers(TestCase):
         )
         output = StringIO()
 
-        with (
-            patch("cwl2puml.assert_process_contained") as assert_process_contained,
-            patch("cwl2puml.assert_connected_graph") as assert_connected_graph,
-            patch(
-                "cwl2puml.to_index",
-                return_value={
-                    "main": root_workflow,
-                    "shared": shared_workflow,
-                    "tool": command,
-                },
-            ),
-        ):
-            cwl2puml.to_puml(
-                cwl_document=[root_workflow, shared_workflow, command],
-                workflow_id="main",
-                diagram_type=DiagramType.SEQUENCE,
-                output_stream=output,
-            )
-
-        assert_process_contained.assert_called_once_with(
-            process=[root_workflow, shared_workflow, command], process_id="main"
-        )
-        assert_connected_graph.assert_called_once_with(
-            [root_workflow, shared_workflow, command]
+        cwl2puml.to_puml(
+            cwl_document={
+                "main": root_workflow,
+                "shared": shared_workflow,
+                "tool": command,
+            },
+            workflow_id="main",
+            diagram_type=DiagramType.SEQUENCE,
+            output_stream=output,
         )
 
         rendered = output.getvalue()
@@ -292,8 +275,11 @@ class TestHelpers(TestCase):
 
 class TestPlugin(TestCase):
     def setUp(self):
+        workflow = SimpleNamespace(id="main")
         self.context = SimpleNamespace(
-            document=object(), resolved_process=SimpleNamespace(id="main")
+            document={"main": workflow},
+            process_id="main",
+            get_processes_by_type=lambda process_type, process_ids: [workflow],
         )
 
     def test_plugin_writes_puml_output(self):
@@ -301,7 +287,7 @@ class TestPlugin(TestCase):
             TemporaryDirectory() as tmpdir,
             patch("cwl2puml.plugin.to_puml") as to_puml_mock,
         ):
-            target = Path(tmpdir, "component.puml")
+            target = Path(tmpdir, "main", "component.puml")
             to_puml_mock.side_effect = (
                 lambda cwl_document, workflow_id, diagram_type, output_stream: (
                     output_stream.write("@startuml\n@enduml\n")
@@ -335,7 +321,7 @@ class TestPlugin(TestCase):
             ) as encode_mock,
             patch("cwl2puml.plugin.requests.get", return_value=response) as get_mock,
         ):
-            target = Path(tmpdir, "component.svg")
+            target = Path(tmpdir, "main", "component.svg")
             to_puml_mock.side_effect = (
                 lambda cwl_document, workflow_id, diagram_type, output_stream: (
                     output_stream.write("@startuml\n@enduml\n")
@@ -371,7 +357,7 @@ class TestPlugin(TestCase):
             patch("cwl2puml.plugin.deflate_and_encode", return_value="encoded-diagram"),
             patch("cwl2puml.plugin.requests.get", return_value=response),
         ):
-            target = Path(tmpdir, "component.png")
+            target = Path(tmpdir, "main", "component.png")
             to_puml_mock.side_effect = (
                 lambda cwl_document, workflow_id, diagram_type, output_stream: (
                     output_stream.write("@startuml\n@enduml\n")
@@ -395,8 +381,8 @@ class TestPlugin(TestCase):
             TemporaryDirectory() as tmpdir,
             patch("cwl2puml.plugin.to_puml", side_effect=RuntimeError("boom")),
         ):
-            target = Path(tmpdir, "component.puml")
-            with self.assertRaisesRegex(RuntimeError, "boom"):
+            target = Path(tmpdir, "main", "component.puml")
+            with self.assertRaises(PluginExecutionError) as raised:
                 plugin.execute(
                     self.context,
                     Cwl2PumlOptions(
@@ -404,13 +390,22 @@ class TestPlugin(TestCase):
                     ),
                 )
 
+            self.assertIsInstance(raised.exception.__cause__, RuntimeError)
+            self.assertEqual(str(raised.exception.__cause__), "boom")
             self.assertFalse(target.exists())
 
     def test_plugin_requires_a_resolved_process(self):
-        context = SimpleNamespace(document=object(), resolved_process=None)
+        def fail_if_no_workflow(process_type, process_ids):
+            raise PluginExecutionError("No Workflow found")
+
+        context = SimpleNamespace(
+            document={},
+            process_id=None,
+            get_processes_by_type=fail_if_no_workflow,
+        )
 
         with (
             TemporaryDirectory() as tmpdir,
-            self.assertRaises(PluginFailureError),
+            self.assertRaises(PluginExecutionError),
         ):
             plugin.execute(context, Cwl2PumlOptions(output=Path(tmpdir)))

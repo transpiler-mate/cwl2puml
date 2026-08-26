@@ -32,11 +32,7 @@ dependencies = [
   "Jinja2==3.1.6",
   "loguru==0.7.3",
   "plantuml==0.3.0",
-  "requests"
-]
-
-[project.optional-dependencies]
-transpiler-mate-api = [
+  "requests",
   "transpiler-mate-api @ git+https://github.com/sim13pods/transpiler-mate-api.git@main",
 ]
 
@@ -76,7 +72,6 @@ exclude_lines = [
 
 [tool.hatch.envs.test]
 skip-install = false
-features = ["transpiler-mate-api"]
 dependencies = [
   "cwl-loader==0.24.0",
   "pytest>=8.4,<10",

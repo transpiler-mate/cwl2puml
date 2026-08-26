@@ -21,12 +21,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import requests
+from cwl_utils.parser import Workflow
 from loguru import logger
 from plantuml import deflate_and_encode
 from pydantic import BaseModel, ConfigDict, Field
 from transpiler_mate.api import (
     PluginExecutionError,
-    PluginFailureError,
     transpiler_plugin,
 )
 
@@ -74,67 +74,71 @@ class Cwl2PumlOptions(BaseModel):
 def cwl2puml(context: TranspilerContext, options: Cwl2PumlOptions) -> None:
     """Converts a CWL, given its document model, to PlantUML diagram(s)."""
 
-    if not context.resolved_process:
-        raise PluginFailureError(
-            "Please specify the The ID of the main Workflow to render via #<workflow-id>"
-        )
-
-    options.output.mkdir(parents=True, exist_ok=True)
-
-    for diagram_type in options.diagrams:
-        logger.info(f"Converting to {diagram_type.name.lower()} PlantUML diagram...")
-        out = StringIO()
-        to_puml(
-            cwl_document=context.document,
-            workflow_id=context.resolved_process.id,
-            diagram_type=diagram_type,
-            output_stream=out,
-        )
-
-        target = Path(options.output, f"{diagram_type.name.lower()}.puml")
-
-        clear_output = out.getvalue()
-        logger.info(
-            f"Saving PlantUML {diagram_type.name.lower()} diagram to {target}..."
-        )
-
-        with target.open("w") as f:
-            f.write(clear_output)
-
-        logger.success(
-            f"PlantUML {diagram_type.name.lower()} diagram successfully dumped to {target}!"
-        )
-
-        if options.convert_image:
-            image_format: str = options.image_format.name.lower()
-
-            logger.info(
-                f"Converting PlantUML {diagram_type.name.lower()} diagram to '{image_format}'..."
-            )
-
-            encoded = deflate_and_encode(clear_output)
-            diagram_url = (
-                f"https://{options.puml_server}/plantuml/{image_format}/{encoded}"
-            )
-            response = requests.get(diagram_url, timeout=30)
-            if HTTPStatus.OK.value == response.status_code:
-                target = Path(
-                    options.output,
-                    f"{diagram_type.name.lower()}.{image_format}",
-                )
+    try:
+        for workflow in context.get_processes_by_type(
+            Workflow, [context.process_id] if context.process_id else None
+        ):
+            for diagram_type in options.diagrams:
                 logger.info(
-                    f"Saving PlantUML {diagram_type.name.lower()} {image_format} image to {target}..."
+                    f"Converting to {diagram_type.name.lower()} PlantUML diagram..."
+                )
+                out = StringIO()
+                to_puml(
+                    cwl_document=context.document,
+                    workflow_id=workflow.id,
+                    diagram_type=diagram_type,
+                    output_stream=out,
                 )
 
-                with target.open("wb") as f:
-                    f.write(response.content)
+                target = Path(
+                    options.output, workflow.id, f"{diagram_type.name.lower()}.puml"
+                )
+                target.parent.mkdir(parents=True, exist_ok=True)
+
+                clear_output = out.getvalue()
+                logger.info(
+                    f"Saving PlantUML {diagram_type.name.lower()} diagram to {target.absolute()}..."
+                )
+
+                with target.open("w") as f:
+                    f.write(clear_output)
 
                 logger.success(
-                    f"PlantUML {diagram_type.name.lower()} {image_format} image successfully dumped to {target}!"
+                    f"PlantUML {diagram_type.name.lower()} diagram successfully dumped to {target.absolute()}!"
                 )
-            else:
-                raise PluginExecutionError(
-                    f"Impossible to render {diagram_type.name.lower()} {image_format} image",
-                    f"{options.puml_server} server replied: {response.status_code} {response.reason}",
-                    f"Deflated and encoded PlantUML Diagram: {encoded}",
-                )
+
+                if options.convert_image:
+                    image_format: str = options.image_format.name.lower()
+
+                    logger.info(
+                        f"Converting PlantUML {diagram_type.name.lower()} diagram to '{image_format}'..."
+                    )
+
+                    encoded = deflate_and_encode(clear_output)
+                    diagram_url = f"https://{options.puml_server}/plantuml/{image_format}/{encoded}"
+                    response = requests.get(diagram_url, timeout=30)
+                    if HTTPStatus.OK.value == response.status_code:
+                        target = Path(
+                            target.parent,
+                            f"{diagram_type.name.lower()}.{image_format}",
+                        )
+                        logger.info(
+                            f"Saving PlantUML {diagram_type.name.lower()} {image_format} image to {target.absolute()}..."
+                        )
+
+                        with target.open("wb") as f:
+                            f.write(response.content)
+
+                        logger.success(
+                            f"PlantUML {diagram_type.name.lower()} {image_format} image successfully dumped to {target.absolute()}!"
+                        )
+                    else:
+                        raise PluginExecutionError(
+                            f"Impossible to render {diagram_type.name.lower()} {image_format} image",
+                            f"{options.puml_server} server replied: {response.status_code} {response.reason}",
+                            f"Deflated and encoded PlantUML Diagram: {encoded}",
+                        )
+    except Exception as e:
+        raise PluginExecutionError(
+            f"An error occurred when serializing to {options.output.absolute()}, see nested exception"
+        ) from e
