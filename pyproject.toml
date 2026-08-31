@@ -29,7 +29,7 @@ classifiers = [
 dependencies = [
   "cwl-loader==0.24.0",
   "cwl-utils==0.42",
-  "click==8.4.2",
+  "click==8.5.0",
   "Jinja2==3.1.6",
   "loguru==0.7.3",
   "plantuml==0.3.0",
