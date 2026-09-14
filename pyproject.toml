@@ -32,12 +32,8 @@ dependencies = [
   "loguru==0.7.3",
   "plantuml==0.3.0",
   "requests",
-  "transpiler-mate-api @ git+https://github.com/sim13pods/transpiler-mate-api.git@main",
+  "transpiler-mate-api==1.0.0",
 ]
-
-# TODO remove me as soon as transpiler-mate-api is on PyPI
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [project.entry-points."transpiler_mate.plugins"]
 cwl2puml = "cwl2puml.plugin:cwl2puml"
