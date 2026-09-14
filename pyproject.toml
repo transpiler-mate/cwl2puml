@@ -68,7 +68,7 @@ exclude_lines = [
 [tool.hatch.envs.test]
 skip-install = false
 dependencies = [
-  "cwl-loader @ git+https://github.com/Terradue/cwl-loader.git@develop",
+  "cwl-loader>=0.25.0",
   "pytest>=8.4,<10",
   "pytest-cov>=6.2,<8",
   "cwltool>=3.2.20260720092025"
