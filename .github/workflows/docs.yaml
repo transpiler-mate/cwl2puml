@@ -13,6 +13,9 @@
 # limitations under the License.
 
 name: docs
+permissions:
+  contents: write
+
 on:
   push:
     branches:
