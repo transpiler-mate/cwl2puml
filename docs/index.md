@@ -1,150 +1,57 @@
-# Introduction 
+# CWL to PlantUML
 
-This project aims to deliver a simple yet powerful CLI tool to ingest [CWL Workflows](https://www.commonwl.org/) and generate [PlantUML diagrams](https://plantuml.com/).
+`cwl2puml` converts Common Workflow Language (CWL) workflows into PlantUML
+diagrams. Use the transpiler-mate plugin for command-line conversion, or the
+Python API to render a loaded CWL document to a text stream.
 
 ## Installation
 
+Python 3.10 or later is required. For command-line use:
+
+```bash
+pip install transpiler-mate-runtime "cwl2puml>=0.48.0"
 ```
-pip install cwl2puml
-```
+!!! note "cwl2puml 0.48.0"
 
-or, for early adopters:
+    Since **0.48.0**, command-line conversion is provided by
+    `transpiler-mate cwl2puml`. The standalone `cwl2puml` command was removed.
+    The Python library remains available independently of the runtime.
 
-```
-pip install --no-cache-dir git+https://github.com/Terradue/cwl2puml@main
-```
+## Quick start
 
-## CLI execution
+Render all diagrams for a workflow named `main`:
 
-```
-Usage: cwl2puml [OPTIONS] WORKFLOW
-
-  Converts a CWL, given its document model, to a PlantUML diagram.
-
-  Args:     `workflow` (`str`): The CWL workflow file (it can be an URL or a
-  file on the File System)     `workflow-id` (`str`): The ID of the main
-  Workflow to render     `output` (`Path`): The output file where streaming
-  the PlantUML diagram     `convert_image` (`bool`): Flag to ton on/off the
-  image generation (on, by default)     `puml_server` (`str`): The host of a
-  PlantUML as a service server (uml.planttext.com by default)
-  `image_format` (`ImageFormat`): The output image format of the PlantUML
-  diagram ('png' by default)
-
-  Returns:     `None`: none
-
-Options:
-  --workflow-id TEXT        ID of the main Workflow  [required]
-  --output PATH             Output directory path  [required]
-  --convert-image BOOLEAN   Flag to ton on/off the image generation (on, by
-                            default)
-  --puml-server TEXT        The host of a PlantUML as a service server
-                            (uml.planttext.com by default)
-  --image-format [png|svg]  The output image format of the PlantUML diagram
-                            ('png' by default)
-  --help                    Show this message and exit.
+```bash
+transpiler-mate cwl2puml --output ./out 'workflow.cwl#main'
 ```
 
-i.e.
+This writes seven `.puml` files under `out/main/`. Omit the source fragment to
+render every workflow in the document. Images are disabled by default; add
+`--convert-image --image-format svg` to request SVG images from a PlantUML
+server.
 
-```
-cwl2puml \
-    --workflow-id main \
-    --output . \
-    --convert-image no \
-    https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl
-```
+See the [plugin guide](plugin.md) for options, output layout, and migration
+instructions.
 
-Output would be
+## Supported diagrams
 
-```
-2025-09-22 16:22:42.498 | DEBUG    | cwl_loader:load_cwl_from_location:213 - Loading CWL document from https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl...
-2025-09-22 16:22:42.687 | DEBUG    | cwl_loader:_load_cwl_from_stream:216 - Reading stream from https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl...
-2025-09-22 16:22:42.727 | DEBUG    | cwl_loader:load_cwl_from_stream:190 - CWL data of type <class 'ruamel.yaml.comments.CommentedMap'> successfully loaded from stream
-2025-09-22 16:22:42.727 | DEBUG    | cwl_loader:load_cwl_from_yaml:135 - No needs to update the Raw CWL document since it targets already the v1.2
-2025-09-22 16:22:42.727 | DEBUG    | cwl_loader:load_cwl_from_yaml:137 - Parsing the raw CWL document to the CWL Utils DOM...
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:load_cwl_from_yaml:150 - Raw CWL document successfully parsed to the CWL Utils DOM!
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:load_cwl_from_yaml:152 - Dereferencing the steps[].run...
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:70 - Checking if https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl#stac must be externally imported...
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:74 - run_url: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl - uri: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:70 - Checking if https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl#rio_stack must be externally imported...
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:74 - run_url: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl - uri: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:70 - Checking if https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl#rio_warp_stack must be externally imported...
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:74 - run_url: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl - uri: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:70 - Checking if https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl#rio_color must be externally imported...
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_on_process:74 - run_url: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl - uri: https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:load_cwl_from_yaml:159 - steps[].run successfully dereferenced! Now dereferencing the FQNs...
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:load_cwl_from_yaml:163 - CWL document successfully dereferenced!
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:load_cwl_from_yaml:166 - Sorting Process instances by dependencies....
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:load_cwl_from_yaml:168 - Sorting process is over.
-2025-09-22 16:22:43.285 | DEBUG    | cwl_loader:_load_cwl_from_stream:224 - Stream from https://raw.githubusercontent.com/eoap/how-to/refs/heads/main/cwl-workflows/conditional-workflows.cwl successfully load!
-2025-09-22 16:22:43.286 | INFO     | cwl2puml.cli:main:66 - ------------------------------------------------------------------------
-2025-09-22 16:22:43.286 | INFO     | cwl2puml.cli:main:72 - Saving PlantUML activity diagram to activity.puml...
-2025-09-22 16:22:43.301 | SUCCESS  | cwl2puml.cli:main:83 - PlantUML activity diagram successfully rendered to activity.puml!
-2025-09-22 16:22:43.301 | INFO     | cwl2puml.cli:main:72 - Saving PlantUML component diagram to component.puml...
-2025-09-22 16:22:43.325 | SUCCESS  | cwl2puml.cli:main:83 - PlantUML component diagram successfully rendered to component.puml!
-2025-09-22 16:22:43.325 | INFO     | cwl2puml.cli:main:72 - Saving PlantUML class diagram to class.puml...
-2025-09-22 16:22:43.346 | SUCCESS  | cwl2puml.cli:main:83 - PlantUML class diagram successfully rendered to class.puml!
-2025-09-22 16:22:43.347 | INFO     | cwl2puml.cli:main:72 - Saving PlantUML sequence diagram to sequence.puml...
-2025-09-22 16:22:43.382 | SUCCESS  | cwl2puml.cli:main:83 - PlantUML sequence diagram successfully rendered to sequence.puml!
-2025-09-22 16:22:43.382 | INFO     | cwl2puml.cli:main:72 - Saving PlantUML state diagram to state.puml...
-2025-09-22 16:22:43.425 | SUCCESS  | cwl2puml.cli:main:83 - PlantUML state diagram successfully rendered to state.puml!
-2025-09-22 16:22:43.425 | INFO     | cwl2puml.cli:main:89 - Total time: 0.9278 seconds
-2025-09-22 16:22:43.426 | INFO     | cwl2puml.cli:main:90 - Finished at: 2025-09-22T16:22:43.425
-```
+| Diagram name | Content |
+| --- | --- |
+| `activity` | Workflow steps and control flow. |
+| `component` | Workflow components and their connections. |
+| `class` | Process inputs, outputs, and types. |
+| `sequence` | Step interactions, including nested workflows. |
+| `state` | Input/output dependencies. |
+| `ogc_processes_inputs` | OGC API - Processes input descriptions as a PlantUML JSON diagram. |
+| `ogc_processes_outputs` | OGC API - Processes output descriptions as a PlantUML JSON diagram. |
 
-then, for example, try to `cat ./activity.puml` :
+## Python usage
 
-```
-/'
- ' Diagram generated by cwl2puml v0.23.0
- ' timestamp: 2025-09-22T16:22:43.301
- '/
-@startuml
-start
+The library does not require the CLI runtime. Install `cwl2puml` and a CWL
+loader for the example in the [API guide](api.md#render-a-workflow).
+`to_puml()` accepts a mapping of process IDs to loaded CWL process objects and
+writes to a text stream; it does not load files or render images itself.
 
-split
-    
-    :stac-item; <<input>>
-split again
-    
-    :epsg_code; <<input>>
-split again
-    
-    :bands; <<input>>
-end split
-    
-repeat
-        
-:step: step_curl
-CommandLineTool: stac;
-        
-repeat while (dotproduct step_curl/common_band_name)
-
-if ($( inputs.epsg_code == "native"))
-           
-:step: step_stack
-CommandLineTool: rio_stack;
-        
-endif
-
-if ($( inputs.epsg_code != "native"))
-
-:step: step_warp_stack
-CommandLineTool: rio_warp_stack;
-        
-endif
-               
-:step: step_color
-CommandLineTool: rio_color;
-        
-split
-    
-    :rgb-tif; <<output>>
-split again
-    
-    :stack; <<output>>
-end split
-    
-stop
-@enduml
-```
+The [example notebook](examples.ipynb) demonstrates the five workflow diagram
+types. The site displays saved notebook outputs without executing the examples
+during a documentation build.
