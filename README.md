@@ -5,19 +5,13 @@
 
 `cwl2puml` converts [Common Workflow Language](https://www.commonwl.org/) workflows into [PlantUML](https://plantuml.com/) diagrams.
 
-It provides a CLI that can:
-
-- load a CWL workflow from a local path or URL
-- render PlantUML source files
-- optionally render PNG or SVG images through a PlantUML server
+It provides a Python API and a transpiler-mate plugin that write PlantUML source
+and optionally render PNG or SVG images through a PlantUML server.
 
 ## Supported Diagrams
 
-- `activity`
-- `component`
-- `class`
-- `sequence`
-- `state`
+`activity`, `component`, `class`, `sequence`, `state`,
+`ogc_processes_inputs`, and `ogc_processes_outputs`.
 
 ## Requirements
 
@@ -32,7 +26,7 @@ task quality:pre-commit:install
 ```
 
 Every commit runs Ruff (including the configured McCabe complexity limit),
-Ruff formatting, strict mypy checks, and the pytest suite.
+Ruff formatting, mypy checks, Bandit security checks, and the pytest suite.
 Run the complete hook explicitly with:
 
 ```console
@@ -41,81 +35,56 @@ task quality:pre-commit:run
 
 ## Installation
 
-Install from the repository:
+For command-line use, install the runtime and plugin together:
 
 ```bash
-pip install .
+pip install transpiler-mate-runtime "cwl2puml>=0.48.0"
 ```
 
-For development:
-
-```bash
-pip install hatch
-```
+For the Python library alone, use `pip install cwl2puml`. To install the current
+checkout, use `pip install .`.
 
 ## CLI Usage
 
-Show the CLI help:
+> [!NOTE]
+> Since release **0.48.0**, `cwl2puml` is a transpiler-mate plugin.
+> The standalone command was removed; use `transpiler-mate cwl2puml`.
+> The Python library remains available.
 
 ```bash
-cwl2puml --help
+transpiler-mate cwl2puml --help
+transpiler-mate cwl2puml --output ./out 'workflow.cwl#main'
 ```
 
-Basic example:
+Omit `#main` to render all workflows. Select diagram types by repeating
+`--diagrams`, and optionally request images:
 
 ```bash
-cwl2puml \
-  https://raw.githubusercontent.com/eoap/application-package-patterns/refs/heads/main/cwl-workflow/pattern-1.cwl \
-  --workflow-id pattern-1 \
-  --output ./out
-```
-
-This writes one `.puml` file per diagram type into `./out`.
-
-Generate only selected diagrams:
-
-```bash
-cwl2puml workflow.cwl \
-  --workflow-id main \
+transpiler-mate cwl2puml \
   --diagrams component \
   --diagrams sequence \
-  --output ./out
-```
-
-Generate SVG images through a PlantUML server:
-
-```bash
-cwl2puml workflow.cwl \
-  --workflow-id main \
-  --diagrams component \
   --output ./out \
   --convert-image \
-  --image-format svg
-```
-
-Use a custom PlantUML server host:
-
-```bash
-cwl2puml workflow.cwl \
-  --workflow-id main \
-  --output ./out \
-  --convert-image \
-  --puml-server uml.planttext.com
+  --image-format svg \
+  'workflow.cwl#main'
 ```
 
 ## Output
 
-For each selected diagram type, the CLI writes:
+The plugin writes `<output>/<workflow.id>/<diagram>.puml`, plus `.png` or `.svg`
+files when image conversion is enabled. The default output directory is
+`./docs`; images are disabled by default. All seven diagram types are selected
+unless `--diagrams` is supplied.
 
-- `<diagram>.puml`
-- optionally `<diagram>.png` or `<diagram>.svg`
+See the [plugin guide](docs/plugin.md) for all options and migration details,
+and the [API guide](docs/api.md) for Python usage.
 
 ## Development
 
-Run the test matrix:
+Install Hatch with `pip install hatch`, then run the test matrix:
 
 ```bash
-hatch run test:test-q
+hatch run test:test
 ```
 
 Run coverage:
@@ -124,7 +93,7 @@ Run coverage:
 hatch run test:test-cov
 ```
 
-Run formatting checks:
+Format the code:
 
 ```bash
 hatch run dev:lint
@@ -139,6 +108,18 @@ hatch run dev:check
 ## Documentation
 
 Project documentation: https://Terradue.github.io/cwl2puml/
+
+To preview the documentation locally, use an isolated environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install mkdocs mkdocs-mermaid2-plugin mkdocs-jupyter "mkdocstrings[python]" pymdown-extensions
+mkdocs serve
+```
+
+Run `mkdocs build --strict` to validate the documentation. Notebook pages use
+their saved outputs; regenerate those outputs in Jupyter when updating examples.
 
 ## Contributing
 

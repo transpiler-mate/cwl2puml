@@ -39,7 +39,5 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: pip install mkdocs-material mkdocs-mermaid2-plugin mkdocs-jupyter legacy-cgi pdocs pillow plantuml eoap-cwlwrap
-      - run: pip install .
-      - run: pdocs as_markdown --output_dir ./docs/api/latest --exclude_source --overwrite cwl2puml
+      - run: pip install mkdocs mkdocs-mermaid2-plugin mkdocs-jupyter mkdocstrings[python] pymdown-extensions
       - run: mkdocs gh-deploy --force

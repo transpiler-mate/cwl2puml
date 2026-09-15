@@ -219,12 +219,10 @@ def to_puml(
     Converts a CWL, given its document model, to a PlantUML diagram.
 
     Args:
-        `cwl_document` (`Processes`): The Processes object model representing the CWL document
-        `diagram_type` (`DiagramType`): The PlantUML diagram type to render
-        `output_stream` (`Stream`): The output stream where serializing the PlantUML diagram
-
-    Returns:
-        `None`: none
+        cwl_document: The Processes object model representing the CWL document.
+        diagram_type: The PlantUML diagram type to render.
+        output_stream: The output stream for the PlantUML diagram.
+        workflow_id: The identifier of the workflow to render.
     """
     template = _jinja_environment.get_template(f"{diagram_type.name.lower()}.puml")
 

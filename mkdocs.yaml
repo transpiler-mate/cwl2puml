@@ -20,7 +20,7 @@ repo_name: Terradue/cwl2puml
 
 theme:
     logo: imgs/icon-eoap.png
-    name: material
+    name: readthedocs
 
     palette:
     - media: "(prefers-color-scheme: light)"
@@ -36,10 +36,15 @@ theme:
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
   - mermaid2:
       version: 11.4.1
   - mkdocs-jupyter:
-      execute: true
+      # Render committed outputs without running network-dependent examples.
+      execute: false
       show_input: True
       no_input: False
 
@@ -74,10 +79,9 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 nav:
-  - index.md
-  - API doc: api/latest/cwl2puml/index.md
-  - Examples:
-    - examples.ipynb
-    - patterns.ipynb
+  - Introduction: index.md
+  - Transpiler-Mate plugin: plugin.md
+  - API doc: api.md
+  - Examples: examples.ipynb
 
 copyright: <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a>
