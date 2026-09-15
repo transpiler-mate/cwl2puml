@@ -23,7 +23,6 @@ from types import UnionType
 from typing import Any, TextIO, Union, get_args, get_origin
 
 from cwl2ogc import BaseCWLtypes2OGCConverter
-from cwl_loader.utils import assert_connected_graph, assert_process_contained, to_index
 from cwl_utils.parser import Process
 from jinja2 import Environment, PackageLoader, select_autoescape
 
@@ -211,7 +210,7 @@ _jinja_environment.tests.update(
 
 
 def to_puml(
-    cwl_document: Process | list[Process],
+    cwl_document: Mapping[str, Process],
     diagram_type: DiagramType,
     output_stream: TextIO,
     workflow_id: str = "main",
@@ -220,23 +219,11 @@ def to_puml(
     Converts a CWL, given its document model, to a PlantUML diagram.
 
     Args:
-        `cwl_document` (`Processes`): The Processes object model representing the CWL document
-        `diagram_type` (`DiagramType`): The PlantUML diagram type to render
-        `output_stream` (`Stream`): The output stream where serializing the PlantUML diagram
-
-    Returns:
-        `None`: none
+        cwl_document: The Processes object model representing the CWL document.
+        diagram_type: The PlantUML diagram type to render.
+        output_stream: The output stream for the PlantUML diagram.
+        workflow_id: The identifier of the workflow to render.
     """
-    assert_process_contained(process=cwl_document, process_id=workflow_id)
-
-    assert_connected_graph(cwl_document)
-
-    index = (
-        to_index(cwl_document)
-        if isinstance(cwl_document, list)
-        else {workflow_id: cwl_document}
-    )
-
     template = _jinja_environment.get_template(f"{diagram_type.name.lower()}.puml")
 
     output_stream.write(
@@ -245,8 +232,8 @@ def to_puml(
             timestamp=datetime.fromtimestamp(time.time()).isoformat(
                 timespec="milliseconds"
             ),
-            workflows=index.values(),
+            workflows=cwl_document.values(),
             workflow_id=workflow_id,
-            index=index,
+            index=cwl_document,
         )
     )

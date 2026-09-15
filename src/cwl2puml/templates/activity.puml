@@ -11,9 +11,9 @@ start
 {% if step.scatter %}repeat{% endif %}
         {% set process = index.get(step.run.split('#')[-1]) %}
         {% if 'Workflow' == process.class_ %}
-group {{ process.id }}
+group {{ process.id }} {
             {{ serialize_workflow(process) }}
-end group        
+}        
         {% else %}
 :step: {{ step.id }}
 {{ process.class_ }}: {{ process.id }};
@@ -25,7 +25,7 @@ end group
 
 {% set process = index.get(workflow_id) %}
 {% if 'Workflow' == process.class_ %}
-group {{ process.id }}
+group {{ process.id }} {
 
 split
     {% for input in process.inputs %}
@@ -41,7 +41,7 @@ split
 {% if loop.last %}end {% endif %}split{% if not loop.last %} again{% endif %}
     {% endfor %}
 
-end group
+}
 {% endif %}
 
 stop
