@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.49.0] - 2026-09-16
+
+### Fixed
+
+- disambiguate same name (in|out)puts, PlantUML error: `element already defined`
+
 ## [0.48.0] - 2026-09-15
 
 ### Changed
@@ -171,7 +177,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed identifier escaping so characters such as `.` do not corrupt PlantUML identifiers.
 - Fixed enum string rendering and Python doc generation issues.
 
-[unreleased]: https://github.com/Terradue/cwl2puml/compare/v0.48.0...HEAD
+[unreleased]: https://github.com/Terradue/cwl2puml/compare/v0.49.0...HEAD
+[0.49.0]: https://github.com/Terradue/cwl2puml/compare/v0.48.0...v0.49.0
 [0.48.0]: https://github.com/Terradue/cwl2puml/compare/v0.47.0...v0.48.0
 [0.47.0]: https://github.com/Terradue/cwl2puml/compare/v0.46.0...v0.47.0
 [0.46.0]: https://github.com/Terradue/cwl2puml/compare/v0.45.0...v0.46.0
