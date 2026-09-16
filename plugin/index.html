@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://Transpiler-Mate.github.io/cwl2puml/plugin/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Transpiler-Mate plugin - CWL to PlantUML</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../styles/css/app.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Transpiler-Mate plugin";
+        var mkdocs_page_input_path = "plugin.md";
+        var mkdocs_page_url = "/cwl2puml/plugin/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="..">
+          <img src="../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Transpiler-Mate plugin</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#convert-a-cwl-document">Convert a CWL document</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#options">Options</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#render-images">Render images</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generated-output">Generated output</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#migrating-from-the-former-cli">Migrating from the former CLI</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#plugin-registration">Plugin registration</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../api/">API doc</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../examples/">Simple Example</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">CWL to PlantUML</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Transpiler-Mate plugin</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/edit/master/docs/plugin.md">Edit on Transpiler-Mate/cwl2puml</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="using-the-transpiler-mate-plugin">Using the transpiler-mate plugin</h1>
+<div class="admonition note">
+<p class="admonition-title">Available since cwl2puml 0.48.0</p>
+<p>Since <strong>0.48.0</strong>, command-line conversion is provided by
+<code>transpiler-mate cwl2puml</code>. The standalone <code>cwl2puml</code> command was removed.
+The Python library remains available independently of the runtime.</p>
+</div>
+<p>The plugin renders CWL workflows as PlantUML source, with optional PNG or SVG
+images. It also supports PlantUML JSON diagrams of OGC API - Processes inputs
+and outputs.</p>
+<h2 id="installation">Installation</h2>
+<p>Install the runtime and plugin in the same Python environment (Python 3.10 or
+later):</p>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1">pip<span class="w"> </span>install<span class="w"> </span>transpiler-mate-runtime<span class="w"> </span><span class="s2">"cwl2puml&gt;=0.48.0"</span>
+</span></code></pre></div>
+<p>The plugin depends on <code>transpiler-mate-api</code>. The separate
+<code>transpiler-mate-runtime</code> package provides the command and discovers installed
+plugins automatically.</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1">transpiler-mate<span class="w"> </span>--help
+</span><span id="__span-1-2">transpiler-mate<span class="w"> </span>cwl2puml<span class="w"> </span>--help
+</span></code></pre></div>
+<h2 id="convert-a-cwl-document">Convert a CWL document</h2>
+<p>Render all supported diagrams for every workflow in a document:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1">transpiler-mate<span class="w"> </span>cwl2puml<span class="w"> </span>--output<span class="w"> </span>./out<span class="w"> </span>workflow.cwl
+</span></code></pre></div>
+<p>Select one workflow using a source fragment, and repeat <code>--diagrams</code> to select
+diagram types:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1">transpiler-mate<span class="w"> </span>cwl2puml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><span class="w">  </span>--diagrams<span class="w"> </span>component<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><span class="w">  </span>--diagrams<span class="w"> </span>sequence<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-4"><span class="w">  </span>--output<span class="w"> </span>./out<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-5"><span class="w">  </span><span class="s1">'workflow.cwl#main'</span>
+</span></code></pre></div>
+<p>The runtime loads the source and supplies the document and optional process ID.
+The plugin selects <code>Workflow</code> processes; a fragment restricts conversion to the
+selected workflow. Tools can appear within workflow diagrams but are not
+rendered as separate top-level targets by the plugin.</p>
+<h2 id="options">Options</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--diagrams NAME</code></td>
+<td>All seven types</td>
+<td>Repeat to select multiple diagram types.</td>
+</tr>
+<tr>
+<td><code>--output PATH</code></td>
+<td><code>./docs</code></td>
+<td>Output directory.</td>
+</tr>
+<tr>
+<td><code>--convert-image / --no-convert-image</code></td>
+<td>Disabled</td>
+<td>Render images through a PlantUML server.</td>
+</tr>
+<tr>
+<td><code>--puml-server HOST</code></td>
+<td><code>uml.planttext.com</code></td>
+<td>Server hostname, without a URL scheme or path.</td>
+</tr>
+<tr>
+<td><code>--image-format NAME</code></td>
+<td><code>png</code></td>
+<td>Image format: <code>png</code> or <code>svg</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Diagram names are <code>activity</code>, <code>component</code>, <code>class</code>, <code>sequence</code>, <code>state</code>,
+<code>ogc_processes_inputs</code>, and <code>ogc_processes_outputs</code>. Enum choices are
+case-insensitive in the runtime CLI.</p>
+<p>Source loading and application metadata validation happen in the runtime before
+conversion. See the runtime's help for shared options and source requirements.</p>
+<h2 id="render-images">Render images</h2>
+<div class="highlight"><pre><span></span><code><span id="__span-4-1">transpiler-mate<span class="w"> </span>cwl2puml<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-2"><span class="w">  </span>--diagrams<span class="w"> </span>component<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-3"><span class="w">  </span>--output<span class="w"> </span>./out<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-4"><span class="w">  </span>--convert-image<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-5"><span class="w">  </span>--image-format<span class="w"> </span>svg<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-6"><span class="w">  </span>--puml-server<span class="w"> </span>uml.planttext.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-7"><span class="w">  </span><span class="s1">'workflow.cwl#main'</span>
+</span></code></pre></div>
+<p>Image conversion sends the encoded PlantUML source to
+<code>https://&lt;host&gt;/plantuml/&lt;format&gt;/&lt;encoded-diagram&gt;</code>. Each request has a
+30-second timeout. PlantUML source is written before the image request; a
+rendering failure raises a plugin execution error and can leave source files
+and earlier outputs on disk.</p>
+<h2 id="generated-output">Generated output</h2>
+<p>Files are written under <code>&lt;output&gt;/&lt;workflow.id&gt;/</code>, using the workflow ID
+supplied by the runtime. For a workflow named <code>main</code>, selecting <code>component</code> and
+<code>sequence</code> with SVG conversion produces:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-5-1">out/
+</span><span id="__span-5-2">└── main/
+</span><span id="__span-5-3">    ├── component.puml
+</span><span id="__span-5-4">    ├── component.svg
+</span><span id="__span-5-5">    ├── sequence.puml
+</span><span id="__span-5-6">    └── sequence.svg
+</span></code></pre></div>
+<p>Missing directories are created and existing files with the same names are
+overwritten. Unselected files in the output directory are retained.</p>
+<p>The OGC diagram types write <code>ogc_processes_inputs.puml</code> and
+<code>ogc_processes_outputs.puml</code>, containing JSON inside PlantUML
+<code>@startjson</code> / <code>@endjson</code> blocks. They do not create a <code>processes.json</code> file.
+For JSON strings without PlantUML wrappers, use the
+<a href="../api/#ogc-process-io">Python I/O helpers</a>.</p>
+<h2 id="migrating-from-the-former-cli">Migrating from the former CLI</h2>
+<ul>
+<li>Install the runtime alongside the plugin and replace <code>cwl2puml</code> with
+  <code>transpiler-mate cwl2puml</code>.</li>
+<li>Replace <code>--workflow-id main</code> with a source fragment: <code>'workflow.cwl#main'</code>.</li>
+<li>Use <code>--convert-image</code> to enable images or <code>--no-convert-image</code> to disable them;
+  do not pass <code>yes</code> or <code>no</code> after the flag.</li>
+<li>Update output consumers to include the workflow subdirectory.</li>
+<li>All seven diagram types are selected by default, including the two OGC types.</li>
+</ul>
+<h2 id="plugin-registration">Plugin registration</h2>
+<p>The package declares this entry point:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-6-1"><span class="k">[project.entry-points.</span><span class="s2">"transpiler_mate.plugins"</span><span class="k">]</span>
+</span><span id="__span-6-2"><span class="n">cwl2puml</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"cwl2puml.plugin:cwl2puml"</span>
+</span></code></pre></div>
+<p>The plugin validates options with <code>Cwl2PumlOptions</code> and receives a
+<code>TranspilerContext</code> from the runtime. See the <a href="../api/">API reference</a> for the
+registration and options model.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Introduction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../api/" class="btn btn-neutral float-right" title="API doc">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/" class="fa fa-code-fork" style="color: #fcfcfc"> Transpiler-Mate/cwl2puml</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../api/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/config.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

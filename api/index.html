@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://Transpiler-Mate.github.io/cwl2puml/api/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>API doc - CWL to PlantUML</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../styles/css/app.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "API doc";
+        var mkdocs_page_input_path = "api.md";
+        var mkdocs_page_url = "/cwl2puml/api/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="..">
+          <img src="../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Introduction</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../plugin/">Transpiler-Mate plugin</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">API doc</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#render-a-workflow">Render a workflow</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ogc-process-io">OGC process I/O</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#converter-apis">Converter APIs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.to_puml">to_puml</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType">DiagramType</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType.ACTIVITY">ACTIVITY</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType.CLASS">CLASS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType.COMPONENT">COMPONENT</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType.OGC_PROCESSES_INPUTS">OGC_PROCESSES_INPUTS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType.OGC_PROCESSES_OUTPUTS">OGC_PROCESSES_OUTPUTS</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType.SEQUENCE">SEQUENCE</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.DiagramType.STATE">STATE</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.get_ogc_inputs">get_ogc_inputs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.get_ogc_outputs">get_ogc_outputs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#plugin-registration">Plugin registration</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.plugin.cwl2puml">cwl2puml</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#options">Options</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.plugin.Cwl2PumlOptions">Cwl2PumlOptions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cwl2puml.plugin.ImageFormat">ImageFormat</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../examples/">Simple Example</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">CWL to PlantUML</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">API doc</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/edit/master/docs/api.md">Edit on Transpiler-Mate/cwl2puml</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!--
+Copyright 2026 Transpiler-Mate
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<h1 id="api-reference">API reference</h1>
+<h2 id="render-a-workflow">Render a workflow</h2>
+<p>Install the library and loader in the same environment:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1">pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"cwl2puml&gt;=0.48.0"</span><span class="w"> </span>cwl-loader
+</span></code></pre></div>
+<p>Load and index a CWL document before rendering it:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+</span><span id="__span-1-2"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="__span-1-3">
+</span><span id="__span-1-4"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_cwl_from_location</span>
+</span><span id="__span-1-5"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl_loader.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_index</span>
+</span><span id="__span-1-6"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl2puml</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiagramType</span><span class="p">,</span> <span class="n">to_puml</span>
+</span><span id="__span-1-7">
+</span><span id="__span-1-8"><span class="n">processes</span> <span class="o">=</span> <span class="n">load_cwl_from_location</span><span class="p">(</span><span class="s2">"workflow.cwl"</span><span class="p">)</span>
+</span><span id="__span-1-9"><span class="n">index</span> <span class="o">=</span> <span class="n">to_index</span><span class="p">(</span><span class="n">processes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">processes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">processes</span><span class="p">])</span>
+</span><span id="__span-1-10">
+</span><span id="__span-1-11"><span class="n">output</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+</span><span id="__span-1-12"><span class="n">to_puml</span><span class="p">(</span>
+</span><span id="__span-1-13">    <span class="n">cwl_document</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+</span><span id="__span-1-14">    <span class="n">workflow_id</span><span class="o">=</span><span class="s2">"main"</span><span class="p">,</span>
+</span><span id="__span-1-15">    <span class="n">diagram_type</span><span class="o">=</span><span class="n">DiagramType</span><span class="o">.</span><span class="n">COMPONENT</span><span class="p">,</span>
+</span><span id="__span-1-16">    <span class="n">output_stream</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+</span><span id="__span-1-17"><span class="p">)</span>
+</span><span id="__span-1-18"><span class="n">Path</span><span class="p">(</span><span class="s2">"component.puml"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>cwl_document</code> is a mapping of process IDs to CWL process objects, not raw YAML
+or a filename. Keep the referenced tools and subworkflows in the mapping.
+<code>workflow_id</code> defaults to <code>"main"</code>; choose the ID present in your loaded index.
+<code>to_puml()</code> writes source to the supplied text stream and returns <code>None</code>.
+The caller owns the stream and any file creation or image rendering.</p>
+<h2 id="ogc-process-io">OGC process I/O</h2>
+<p><code>get_ogc_inputs(process)</code> and <code>get_ogc_outputs(process)</code> return indented JSON
+<strong>strings</strong>, using <code>BaseCWLtypes2OGCConverter</code> from <code>cwl2ogc</code>:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl2puml</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_ogc_inputs</span><span class="p">,</span> <span class="n">get_ogc_outputs</span>
+</span><span id="__span-2-2">
+</span><span id="__span-2-3"><span class="n">process</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s2">"main"</span><span class="p">]</span>
+</span><span id="__span-2-4"><span class="n">Path</span><span class="p">(</span><span class="s2">"inputs.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">get_ogc_inputs</span><span class="p">(</span><span class="n">process</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="__span-2-5"><span class="n">Path</span><span class="p">(</span><span class="s2">"outputs.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">get_ogc_outputs</span><span class="p">(</span><span class="n">process</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Use <code>DiagramType.OGC_PROCESSES_INPUTS</code> or
+<code>DiagramType.OGC_PROCESSES_OUTPUTS</code> with <code>to_puml()</code> to wrap these descriptions
+in a PlantUML JSON diagram instead.</p>
+<h2 id="converter-apis">Converter APIs</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="cwl2puml.to_puml"></a>
+    <div class="doc doc-contents first">
+
+        <p>Converts a CWL, given its document model, to a PlantUML diagram.</p>
+
+
+<table class="field-list">
+  <colgroup>
+    <col class="field-name" />
+    <col class="field-body" />
+  </colgroup>
+  <tbody valign="top">
+    <tr class="field">
+      <th class="field-name">Parameters:</th>
+      <td class="field-body">
+        <ul class="first simple">
+            <li>
+              <b><code>cwl_document</code></b>
+                  (<code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="cwl_utils.parser.Process">Process</span>]</code>)
+              –
+              <div class="doc-md-description">
+                <p>The Processes object model representing the CWL document.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>diagram_type</code></b>
+                  (<code><a class="autorefs autorefs-internal" title="cwl2puml.DiagramType" href="#cwl2puml.DiagramType">DiagramType</a></code>)
+              –
+              <div class="doc-md-description">
+                <p>The PlantUML diagram type to render.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>output_stream</code></b>
+                  (<code><span title="typing.TextIO">TextIO</span></code>)
+              –
+              <div class="doc-md-description">
+                <p>The output stream for the PlantUML diagram.</p>
+              </div>
+            </li>
+            <li>
+              <b><code>workflow_id</code></b>
+                  (<code><span title="str">str</span></code>, default:
+                      <code>&#39;main&#39;</code>
+)
+              –
+              <div class="doc-md-description">
+                <p>The identifier of the workflow to render.</p>
+              </div>
+            </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/cwl2puml/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-212"><span class="k">def</span><span class="w"> </span><span class="nf">to_puml</span><span class="p">(</span>
+</span><span id="__span-0-213">    <span class="n">cwl_document</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Process</span><span class="p">],</span>
+</span><span id="__span-0-214">    <span class="n">diagram_type</span><span class="p">:</span> <span class="n">DiagramType</span><span class="p">,</span>
+</span><span id="__span-0-215">    <span class="n">output_stream</span><span class="p">:</span> <span class="n">TextIO</span><span class="p">,</span>
+</span><span id="__span-0-216">    <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"main"</span><span class="p">,</span>
+</span><span id="__span-0-217"><span class="p">):</span>
+</span><span id="__span-0-218"><span class="w">    </span><span class="sd">"""</span>
+</span><span id="__span-0-219"><span class="sd">    Converts a CWL, given its document model, to a PlantUML diagram.</span>
+</span><span id="__span-0-220">
+</span><span id="__span-0-221"><span class="sd">    Args:</span>
+</span><span id="__span-0-222"><span class="sd">        cwl_document: The Processes object model representing the CWL document.</span>
+</span><span id="__span-0-223"><span class="sd">        diagram_type: The PlantUML diagram type to render.</span>
+</span><span id="__span-0-224"><span class="sd">        output_stream: The output stream for the PlantUML diagram.</span>
+</span><span id="__span-0-225"><span class="sd">        workflow_id: The identifier of the workflow to render.</span>
+</span><span id="__span-0-226"><span class="sd">    """</span>
+</span><span id="__span-0-227">    <span class="n">template</span> <span class="o">=</span> <span class="n">_jinja_environment</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.puml"</span><span class="p">)</span>
+</span><span id="__span-0-228">
+</span><span id="__span-0-229">    <span class="n">output_stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+</span><span id="__span-0-230">        <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+</span><span id="__span-0-231">            <span class="n">version</span><span class="o">=</span><span class="n">_get_version</span><span class="p">(),</span>
+</span><span id="__span-0-232">            <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(</span>
+</span><span id="__span-0-233">                <span class="n">timespec</span><span class="o">=</span><span class="s2">"milliseconds"</span>
+</span><span id="__span-0-234">            <span class="p">),</span>
+</span><span id="__span-0-235">            <span class="n">workflows</span><span class="o">=</span><span class="n">cwl_document</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+</span><span id="__span-0-236">            <span class="n">workflow_id</span><span class="o">=</span><span class="n">workflow_id</span><span class="p">,</span>
+</span><span id="__span-0-237">            <span class="n">index</span><span class="o">=</span><span class="n">cwl_document</span><span class="p">,</span>
+</span><span id="__span-0-238">        <span class="p">)</span>
+</span><span id="__span-0-239">    <span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="cwl2puml.DiagramType"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="enum.Enum">Enum</span></code></p>
+
+
+
+        <p>The supported PlantUML diagram types</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/cwl2puml/__init__.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-59"><span class="k">class</span><span class="w"> </span><span class="nc">DiagramType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="__span-0-60"><span class="w">    </span><span class="sd">"""The supported PlantUML diagram types"""</span>
+</span><span id="__span-0-61">
+</span><span id="__span-0-62">    <span class="n">ACTIVITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-63"><span class="w">    </span><span class="sd">"""Represents the PlantUML `activity' diagram"""</span>
+</span><span id="__span-0-64">    <span class="n">COMPONENT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-65"><span class="w">    </span><span class="sd">"""Represents the PlantUML `components' diagram"""</span>
+</span><span id="__span-0-66">    <span class="n">CLASS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-67"><span class="w">    </span><span class="sd">"""Represents the PlantUML `class' diagram"""</span>
+</span><span id="__span-0-68">    <span class="n">SEQUENCE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-69"><span class="w">    </span><span class="sd">"""Represents the PlantUML `sequence' diagram"""</span>
+</span><span id="__span-0-70">    <span class="n">STATE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-71"><span class="w">    </span><span class="sd">"""Represents the PlantUML `state' diagram"""</span>
+</span><span id="__span-0-72">    <span class="n">OGC_PROCESSES_INPUTS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-73"><span class="w">    </span><span class="sd">"""Represents the PlantUML `JSON' diagram for OGC API Processes - Process description inputs"""</span>
+</span><span id="__span-0-74">    <span class="n">OGC_PROCESSES_OUTPUTS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-75"><span class="w">    </span><span class="sd">"""Represents the PlantUML `JSON' diagram for OGC API Processes - Process description outputs"""</span>
+</span></code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="cwl2puml.DiagramType.ACTIVITY" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">ACTIVITY</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Represents the PlantUML `activity' diagram</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="cwl2puml.DiagramType.CLASS" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">CLASS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Represents the PlantUML `class' diagram</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="cwl2puml.DiagramType.COMPONENT" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">COMPONENT</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Represents the PlantUML `components' diagram</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="cwl2puml.DiagramType.OGC_PROCESSES_INPUTS" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">OGC_PROCESSES_INPUTS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Represents the PlantUML `JSON' diagram for OGC API Processes - Process description inputs</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="cwl2puml.DiagramType.OGC_PROCESSES_OUTPUTS" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">OGC_PROCESSES_OUTPUTS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Represents the PlantUML `JSON' diagram for OGC API Processes - Process description outputs</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="cwl2puml.DiagramType.SEQUENCE" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">SEQUENCE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Represents the PlantUML `sequence' diagram</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="cwl2puml.DiagramType.STATE" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">STATE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Represents the PlantUML `state' diagram</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="cwl2puml.get_ogc_inputs"></a>
+    <div class="doc doc-contents first">
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/cwl2puml/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">162</span>
+<span class="normal">163</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-162"><span class="k">def</span><span class="w"> </span><span class="nf">get_ogc_inputs</span><span class="p">(</span><span class="n">process</span><span class="p">:</span> <span class="n">Process</span><span class="p">):</span>
+</span><span id="__span-0-163">    <span class="k">return</span> <span class="n">_dump_json</span><span class="p">(</span><span class="n">BaseCWLtypes2OGCConverter</span><span class="p">(</span><span class="n">process</span><span class="p">)</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">())</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="cwl2puml.get_ogc_outputs"></a>
+    <div class="doc doc-contents first">
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/cwl2puml/__init__.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">166</span>
+<span class="normal">167</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-166"><span class="k">def</span><span class="w"> </span><span class="nf">get_ogc_outputs</span><span class="p">(</span><span class="n">process</span><span class="p">:</span> <span class="n">Process</span><span class="p">):</span>
+</span><span id="__span-0-167">    <span class="k">return</span> <span class="n">_dump_json</span><span class="p">(</span><span class="n">BaseCWLtypes2OGCConverter</span><span class="p">(</span><span class="n">process</span><span class="p">)</span><span class="o">.</span><span class="n">get_outputs</span><span class="p">())</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h2 id="plugin-registration">Plugin registration</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="cwl2puml.plugin.cwl2puml"></a>
+    <div class="doc doc-contents first">
+
+        <p>Converts a CWL, given its document model, to PlantUML diagram(s).</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/cwl2puml/plugin.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-69"><span class="nd">@transpiler_plugin</span><span class="p">(</span>
+</span><span id="__span-0-70">    <span class="n">name</span><span class="o">=</span><span class="s2">"cwl2puml"</span><span class="p">,</span>
+</span><span id="__span-0-71">    <span class="n">description</span><span class="o">=</span><span class="s2">"Converts a CWL, given its document model, to PlantUML diagram(s)."</span><span class="p">,</span>
+</span><span id="__span-0-72">    <span class="n">options_model</span><span class="o">=</span><span class="n">Cwl2PumlOptions</span><span class="p">,</span>
+</span><span id="__span-0-73"><span class="p">)</span>
+</span><span id="__span-0-74"><span class="k">def</span><span class="w"> </span><span class="nf">cwl2puml</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">TranspilerContext</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Cwl2PumlOptions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-75"><span class="w">    </span><span class="sd">"""Converts a CWL, given its document model, to PlantUML diagram(s)."""</span>
+</span><span id="__span-0-76">
+</span><span id="__span-0-77">    <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-0-78">        <span class="k">for</span> <span class="n">workflow</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">get_processes_by_type</span><span class="p">(</span>
+</span><span id="__span-0-79">            <span class="n">Workflow</span><span class="p">,</span> <span class="p">[</span><span class="n">context</span><span class="o">.</span><span class="n">process_id</span><span class="p">]</span> <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">process_id</span> <span class="k">else</span> <span class="kc">None</span>
+</span><span id="__span-0-80">        <span class="p">):</span>
+</span><span id="__span-0-81">            <span class="k">for</span> <span class="n">diagram_type</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">diagrams</span><span class="p">:</span>
+</span><span id="__span-0-82">                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+</span><span id="__span-0-83">                    <span class="sa">f</span><span class="s2">"Converting to </span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> PlantUML diagram..."</span>
+</span><span id="__span-0-84">                <span class="p">)</span>
+</span><span id="__span-0-85">                <span class="n">out</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+</span><span id="__span-0-86">                <span class="n">to_puml</span><span class="p">(</span>
+</span><span id="__span-0-87">                    <span class="n">cwl_document</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">document</span><span class="p">,</span>
+</span><span id="__span-0-88">                    <span class="n">workflow_id</span><span class="o">=</span><span class="n">workflow</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+</span><span id="__span-0-89">                    <span class="n">diagram_type</span><span class="o">=</span><span class="n">diagram_type</span><span class="p">,</span>
+</span><span id="__span-0-90">                    <span class="n">output_stream</span><span class="o">=</span><span class="n">out</span><span class="p">,</span>
+</span><span id="__span-0-91">                <span class="p">)</span>
+</span><span id="__span-0-92">
+</span><span id="__span-0-93">                <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+</span><span id="__span-0-94">                    <span class="n">options</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">workflow</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.puml"</span>
+</span><span id="__span-0-95">                <span class="p">)</span>
+</span><span id="__span-0-96">                <span class="n">target</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="__span-0-97">
+</span><span id="__span-0-98">                <span class="n">clear_output</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+</span><span id="__span-0-99">                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+</span><span id="__span-0-100">                    <span class="sa">f</span><span class="s2">"Saving PlantUML </span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> diagram to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">..."</span>
+</span><span id="__span-0-101">                <span class="p">)</span>
+</span><span id="__span-0-102">
+</span><span id="__span-0-103">                <span class="k">with</span> <span class="n">target</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="__span-0-104">                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">clear_output</span><span class="p">)</span>
+</span><span id="__span-0-105">
+</span><span id="__span-0-106">                <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+</span><span id="__span-0-107">                    <span class="sa">f</span><span class="s2">"PlantUML </span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> diagram successfully dumped to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">!"</span>
+</span><span id="__span-0-108">                <span class="p">)</span>
+</span><span id="__span-0-109">
+</span><span id="__span-0-110">                <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">convert_image</span><span class="p">:</span>
+</span><span id="__span-0-111">                    <span class="n">image_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">image_format</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="__span-0-112">
+</span><span id="__span-0-113">                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+</span><span id="__span-0-114">                        <span class="sa">f</span><span class="s2">"Converting PlantUML </span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> diagram to '</span><span class="si">{</span><span class="n">image_format</span><span class="si">}</span><span class="s2">'..."</span>
+</span><span id="__span-0-115">                    <span class="p">)</span>
+</span><span id="__span-0-116">
+</span><span id="__span-0-117">                    <span class="n">encoded</span> <span class="o">=</span> <span class="n">deflate_and_encode</span><span class="p">(</span><span class="n">clear_output</span><span class="p">)</span>
+</span><span id="__span-0-118">                    <span class="n">diagram_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"https://</span><span class="si">{</span><span class="n">options</span><span class="o">.</span><span class="n">puml_server</span><span class="si">}</span><span class="s2">/plantuml/</span><span class="si">{</span><span class="n">image_format</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s2">"</span>
+</span><span id="__span-0-119">                    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">diagram_url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</span><span id="__span-0-120">                    <span class="k">if</span> <span class="n">HTTPStatus</span><span class="o">.</span><span class="n">OK</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">:</span>
+</span><span id="__span-0-121">                        <span class="n">target</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+</span><span id="__span-0-122">                            <span class="n">target</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span>
+</span><span id="__span-0-123">                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">image_format</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="__span-0-124">                        <span class="p">)</span>
+</span><span id="__span-0-125">                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+</span><span id="__span-0-126">                            <span class="sa">f</span><span class="s2">"Saving PlantUML </span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">image_format</span><span class="si">}</span><span class="s2"> image to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">..."</span>
+</span><span id="__span-0-127">                        <span class="p">)</span>
+</span><span id="__span-0-128">
+</span><span id="__span-0-129">                        <span class="k">with</span> <span class="n">target</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="__span-0-130">                            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span id="__span-0-131">
+</span><span id="__span-0-132">                        <span class="n">logger</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+</span><span id="__span-0-133">                            <span class="sa">f</span><span class="s2">"PlantUML </span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">image_format</span><span class="si">}</span><span class="s2"> image successfully dumped to </span><span class="si">{</span><span class="n">target</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">!"</span>
+</span><span id="__span-0-134">                        <span class="p">)</span>
+</span><span id="__span-0-135">                    <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-0-136">                        <span class="k">raise</span> <span class="n">PluginExecutionError</span><span class="p">(</span>
+</span><span id="__span-0-137">                            <span class="sa">f</span><span class="s2">"Impossible to render </span><span class="si">{</span><span class="n">diagram_type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">image_format</span><span class="si">}</span><span class="s2"> image"</span><span class="p">,</span>
+</span><span id="__span-0-138">                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">options</span><span class="o">.</span><span class="n">puml_server</span><span class="si">}</span><span class="s2"> server replied: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="__span-0-139">                            <span class="sa">f</span><span class="s2">"Deflated and encoded PlantUML Diagram: </span><span class="si">{</span><span class="n">encoded</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="__span-0-140">                        <span class="p">)</span>
+</span><span id="__span-0-141">    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="__span-0-142">        <span class="k">raise</span> <span class="n">PluginExecutionError</span><span class="p">(</span>
+</span><span id="__span-0-143">            <span class="sa">f</span><span class="s2">"An error occurred when serializing to </span><span class="si">{</span><span class="n">options</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">, see nested exception"</span>
+</span><span id="__span-0-144">        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</span></code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h2 id="options">Options</h2>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="cwl2puml.plugin.Cwl2PumlOptions"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Options accepted by the cwl2puml plugin.</p>
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/cwl2puml/plugin.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-44"><span class="k">class</span><span class="w"> </span><span class="nc">Cwl2PumlOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+</span><span id="__span-0-45"><span class="w">    </span><span class="sd">"""Options accepted by the cwl2puml plugin."""</span>
+</span><span id="__span-0-46">
+</span><span id="__span-0-47">    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">"forbid"</span><span class="p">)</span>
+</span><span id="__span-0-48">
+</span><span id="__span-0-49">    <span class="n">diagrams</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DiagramType</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="__span-0-50">        <span class="n">default</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">DiagramType</span><span class="p">),</span>
+</span><span id="__span-0-51">        <span class="n">description</span><span class="o">=</span><span class="s2">"The PlantUML diagram to serialize (all the supported kinds, by default)."</span><span class="p">,</span>
+</span><span id="__span-0-52">    <span class="p">)</span>
+</span><span id="__span-0-53">
+</span><span id="__span-0-54">    <span class="n">output</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">"./docs"</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Output directory path"</span><span class="p">)</span>
+</span><span id="__span-0-55">    <span class="n">convert_image</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="__span-0-56">        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">"Flag to turn on/off the image generation."</span>
+</span><span id="__span-0-57">    <span class="p">)</span>
+</span><span id="__span-0-58">    <span class="n">puml_server</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="__span-0-59">        <span class="n">default</span><span class="o">=</span><span class="s2">"uml.planttext.com"</span><span class="p">,</span>
+</span><span id="__span-0-60">        <span class="n">description</span><span class="o">=</span><span class="s2">"The host of a PlantUML as a service server."</span><span class="p">,</span>
+</span><span id="__span-0-61">    <span class="p">)</span>
+</span><span id="__span-0-62">
+</span><span id="__span-0-63">    <span class="n">image_format</span><span class="p">:</span> <span class="n">ImageFormat</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+</span><span id="__span-0-64">        <span class="n">default</span><span class="o">=</span><span class="n">ImageFormat</span><span class="o">.</span><span class="n">PNG</span><span class="p">,</span>
+</span><span id="__span-0-65">        <span class="n">description</span><span class="o">=</span><span class="s2">"The output image format of the PlantUML diagram."</span><span class="p">,</span>
+</span><span id="__span-0-66">    <span class="p">)</span>
+</span></code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="cwl2puml.plugin.ImageFormat"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="enum.Enum">Enum</span></code></p>
+
+
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>src/cwl2puml/plugin.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-39"><span class="k">class</span><span class="w"> </span><span class="nc">ImageFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="__span-0-40">    <span class="n">PNG</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span><span id="__span-0-41">    <span class="n">SVG</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</span></code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+
+</div>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../plugin/" class="btn btn-neutral float-left" title="Transpiler-Mate plugin"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../examples/" class="btn btn-neutral float-right" title="Simple Example">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/" class="fa fa-code-fork" style="color: #fcfcfc"> Transpiler-Mate/cwl2puml</a>
+        </span>
+    
+    
+      <span><a href="../plugin/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../examples/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../javascripts/config.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
