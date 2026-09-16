@@ -12,31 +12,31 @@ skinparam linetype ortho
 node "{{ workflow.class_ }} '{{ workflow.id }}'" {
     component "{{ workflow.id }}" as {{ workflow.id | to_puml_name }} {
     {% for input in workflow.inputs %}
-        portin "{{ input.id }}" as {{ workflow.id | to_puml_name }}_{{ input.id | to_puml_name }}
+        portin "{{ input.id }}" as IN_{{ workflow.id | to_puml_name }}_{{ input.id | to_puml_name }}
     {% endfor %}
     {% for output in workflow.outputs %}
-        portout "{{ output.id }}" as {{ workflow.id | to_puml_name }}_{{ output.id | to_puml_name }}
+        portout "{{ output.id }}" as OUT_{{ workflow.id | to_puml_name }}_{{ output.id | to_puml_name }}
     {% endfor %}
     }
 
 {% for step in workflow.steps %}
     frame "{{ step.id }}" as {{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }} {
     {% for input in step.in_ %}
-        portin "{{ input.id }}" as {{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ input.id | to_puml_name }}
+        portin "{{ input.id }}" as IN_{{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ input.id | to_puml_name }}
         {% if input.source %}
             {% if input.source is not_single_item_list %}
                 {% for input_source in input.source  %}
-        {{ workflow.id | to_puml_name }}_{{ input_source | get_value_from_str_or_single_item_list | to_puml_name }} .down.> {{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ input.id | to_puml_name }}
+        IN_{{ workflow.id | to_puml_name }}_{{ input_source | get_value_from_str_or_single_item_list | to_puml_name }} .down.> IN_{{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ input.id | to_puml_name }}
                 {% endfor %}
             {% else %}
                 {% set input_source = input.source | get_value_from_str_or_single_item_list %}
-        {{ workflow.id | to_puml_name }}_{{ input_source | to_puml_name }} .down.> {{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ input.id | to_puml_name }}
+        IN_{{ workflow.id | to_puml_name }}_{{ input_source | to_puml_name }} .down.> IN_{{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ input.id | to_puml_name }}
             {% endif %}
         {% endif %}
     {% endfor %}
 
     {% for output in step.out %}
-        portout "{{ output }}" as {{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ output | to_puml_name }}
+        portout "{{ output }}" as OUT_{{ workflow.id | to_puml_name }}_{{ step.id | to_puml_name }}_{{ output | to_puml_name }}
     {% endfor %}
 
         component "{{ step.run[1:] }}" as {{ step.run[1:] | to_puml_name }}
@@ -48,10 +48,10 @@ node "{{ workflow.class_ }} '{{ workflow.id }}'" {
         {% if output.outputSource %}
             {% if output.outputSource is not_single_item_list %}
                     {% for output_source in output.outputSource %}
-{{ workflow.id | to_puml_name }}_{{ output_source | get_value_from_str_or_single_item_list | to_puml_name }} .up.> {{ workflow.id | to_puml_name }}_{{ output.id | to_puml_name }}
+OUT_{{ workflow.id | to_puml_name }}_{{ output_source | get_value_from_str_or_single_item_list | to_puml_name }} .up.> OUT_{{ workflow.id | to_puml_name }}_{{ output.id | to_puml_name }}
                     {% endfor %}
             {% else %}
-{{ workflow.id | to_puml_name }}_{{ output.outputSource | get_value_from_str_or_single_item_list | to_puml_name }} .up.> {{ workflow.id | to_puml_name }}_{{ output.id | to_puml_name }}
+OUT_{{ workflow.id | to_puml_name }}_{{ output.outputSource | get_value_from_str_or_single_item_list | to_puml_name }} .up.> OUT_{{ workflow.id | to_puml_name }}_{{ output.id | to_puml_name }}
             {% endif %}
         {% endif %}
     {% endfor %}
