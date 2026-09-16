@@ -13,10 +13,10 @@
 # limitations under the License.
 
 site_name: CWL to PlantUML
-site_url: https://terradue.github.io/cwl2puml/
+site_url: https://Transpiler-Mate.github.io/cwl2puml/
 site_author: Fabrice Brito, Simone Tripodi
-repo_url: https://github.com/Terradue/cwl2puml/
-repo_name: Terradue/cwl2puml
+repo_url: https://github.com/Transpiler-Mate/cwl2puml/
+repo_name: Transpiler-Mate/cwl2puml
 
 theme:
     logo: imgs/icon-eoap.png
