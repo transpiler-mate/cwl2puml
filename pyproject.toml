@@ -9,7 +9,7 @@ description = 'CWL Worflows processor to generate PlantUML diagrams'
 
 readme = "README.md"
 requires-python = ">=3.10"
-license = "MIT"
+license = "Apache-2.0"
 keywords = []
 authors = [
   { name = "Fabrice Brito", email = "info@terradue.com" },
@@ -39,9 +39,9 @@ dependencies = [
 cwl2puml = "cwl2puml.plugin:cwl2puml"
 
 [project.urls]
-Documentation = "https://terradue.github.io/cwl2puml/"
-Issues = "https://github.com/Terradue/cwl2puml/issues"
-Source = "https://github.com/Terradue/cwl2puml"
+Documentation = "https://Transpiler-Mate.github.io/cwl2puml/"
+Issues = "https://github.com/Transpiler-Mate/cwl2puml/issues"
+Source = "https://github.com/Transpiler-Mate/cwl2puml"
 
 [tool.hatch.version]
 path = "src/cwl2puml/__about__.py"
