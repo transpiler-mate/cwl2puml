@@ -19,14 +19,20 @@ from importlib.metadata import PackageNotFoundError
 from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from types import SimpleNamespace
 from typing import TYPE_CHECKING
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import create_autospec, patch
 
 from cwl_loader import load_cwl_from_location
 from cwl_loader.utils import to_index
-from transpiler_mate.api import PluginExecutionError
+from cwl_utils.parser.cwl_v1_2 import (
+    CommandLineTool,
+    Workflow,
+    WorkflowInputParameter,
+    WorkflowStep,
+    WorkflowStepInput,
+)
+from transpiler_mate.api import PluginExecutionError, TranspilerContext
 
 import cwl2puml
 from cwl2puml import DiagramType, to_puml
@@ -38,14 +44,15 @@ if TYPE_CHECKING:
 
 
 class Testloading(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
+        document = load_cwl_from_location(
+            path="https://raw.githubusercontent.com/eoap/application-package-patterns/refs/heads/main/cwl-workflow/pattern-1.cwl"
+        )
         self.graph: Mapping[str, Process] = to_index(
-            load_cwl_from_location(
-                path="https://raw.githubusercontent.com/eoap/application-package-patterns/refs/heads/main/cwl-workflow/pattern-1.cwl"
-            )
+            document if isinstance(document, list) else [document]
         )
 
-    def _test_diagram(self, diagram_type: DiagramType):
+    def _test_diagram(self, diagram_type: DiagramType) -> None:
         self.assertIsNotNone(self.graph, "Expected non null $graph, found None")
         self.assertIsInstance(
             self.graph, Mapping, f"Expecting graph as mapping, found {type(self.graph)}"
@@ -70,45 +77,45 @@ class Testloading(TestCase):
             "Expected non empty PlantUML text for {diagram_type.name()}",
         )
 
-    def test_components_diagram(self):
+    def test_components_diagram(self) -> None:
         self._test_diagram(DiagramType.COMPONENT)
 
-    def test_class_diagram(self):
+    def test_class_diagram(self) -> None:
         self._test_diagram(DiagramType.CLASS)
 
-    def test_sequence_diagram(self):
+    def test_sequence_diagram(self) -> None:
         self._test_diagram(DiagramType.SEQUENCE)
 
-    def test_state_diagram(self):
+    def test_state_diagram(self) -> None:
         self._test_diagram(DiagramType.STATE)
 
-    def test_activity_diagram(self):
+    def test_activity_diagram(self) -> None:
         self._test_diagram(DiagramType.ACTIVITY)
 
 
 class TestHelpers(TestCase):
-    def test_to_puml_name(self):
+    def test_to_puml_name(self) -> None:
         self.assertEqual(cwl2puml._to_puml_name("a-b/c"), "a_b_c")
 
-    def test_jinja_environment_registers_get_uri_anchor_filter(self):
+    def test_jinja_environment_registers_get_uri_anchor_filter(self) -> None:
         self.assertIs(
             cwl2puml._jinja_environment.filters["get_uri_anchor"],
             cwl2puml.get_uri_anchor,
         )
 
-    def test_type_to_string_with_union(self):
+    def test_type_to_string_with_union(self) -> None:
         rendered = cwl2puml._type_to_string("test_id", str | int)
         self.assertEqual(rendered, "str | int")
 
-    def test_type_to_string_with_list(self):
+    def test_type_to_string_with_list(self) -> None:
         rendered = cwl2puml._type_to_string("test_id", ["File", "Directory"])
         self.assertEqual(rendered, "File | Directory")
 
-    def test_type_to_string_with_array_like_object(self):
+    def test_type_to_string_with_array_like_object(self) -> None:
         array_like = type("ArrayLike", (), {"items": "File"})()
         self.assertEqual(cwl2puml._type_to_string("test_id", array_like), "File[]")
 
-    def test_type_to_string_with_enum_like_object(self):
+    def test_type_to_string_with_enum_like_object(self) -> None:
         enum_like = type(
             "EnumLike",
             (),
@@ -116,54 +123,44 @@ class TestHelpers(TestCase):
         )()
         self.assertEqual(cwl2puml._type_to_string("test_id", enum_like), "TestId")
 
-    def test_type_to_string_with_named_type(self):
+    def test_type_to_string_with_named_type(self) -> None:
         self.assertEqual(cwl2puml._type_to_string("test_id", int), "int")
 
-    def test_type_to_string_with_fallback_object(self):
+    def test_type_to_string_with_fallback_object(self) -> None:
         rendered = cwl2puml._type_to_string("test_id", object())
         self.assertIn("object object", rendered)
 
-    def test_not_single_item_list(self):
+    def test_not_single_item_list(self) -> None:
         self.assertTrue(cwl2puml._not_single_item_list(["a", "b"]))
         self.assertFalse(cwl2puml._not_single_item_list(["a"]))
         self.assertFalse(cwl2puml._not_single_item_list("a"))
 
-    def test_get_value_from_str_or_single_item_list(self):
+    def test_get_value_from_str_or_single_item_list(self) -> None:
         self.assertEqual(cwl2puml._get_value_from_str_or_single_item_list(["a"]), "a")
         self.assertEqual(cwl2puml._get_value_from_str_or_single_item_list("a"), "a")
 
-    def test_get_version_returns_na_when_package_is_missing(self):
+    def test_get_version_returns_na_when_package_is_missing(self) -> None:
         with patch("cwl2puml.version", side_effect=PackageNotFoundError):
             self.assertEqual(cwl2puml._get_version(), "N/A")
 
-    def test_to_mapping_uses_trimmed_function_names(self):
-        mapping = cwl2puml._to_mapping(
-            [cwl2puml._to_puml_name, cwl2puml._not_single_item_list]
-        )
+    def test_to_mapping_uses_trimmed_function_names(self) -> None:
+        mapping = cwl2puml._to_mapping([cwl2puml._to_puml_name, cwl2puml._not_single_item_list])
 
         self.assertEqual(mapping["to_puml_name"], cwl2puml._to_puml_name)
-        self.assertEqual(
-            mapping["not_single_item_list"], cwl2puml._not_single_item_list
-        )
+        self.assertEqual(mapping["not_single_item_list"], cwl2puml._not_single_item_list)
 
-    def test_to_puml_renders_single_process_documents(self):
-        fake_document = {"main": object()}
+    def test_to_puml_renders_single_process_documents(self) -> None:
+        fake_document = {"main": Workflow(id="main", inputs=[], outputs=[], steps=[])}
         fake_template = type(
             "FakeTemplate",
             (),
-            {
-                "render": lambda self, **kwargs: (
-                    f"{kwargs['workflow_id']}|{kwargs['version']}"
-                )
-            },
+            {"render": lambda self, **kwargs: f"{kwargs['workflow_id']}|{kwargs['version']}"},
         )()
         output = StringIO()
 
         with (
             patch("cwl2puml._get_version", return_value="1.2.3"),
-            patch.object(
-                cwl2puml._jinja_environment, "get_template", return_value=fake_template
-            ),
+            patch.object(cwl2puml._jinja_environment, "get_template", return_value=fake_template),
         ):
             cwl2puml.to_puml(
                 cwl_document=fake_document,
@@ -174,20 +171,19 @@ class TestHelpers(TestCase):
 
         self.assertEqual(output.getvalue(), "main|1.2.3")
 
-    def test_sequence_diagram_qualifies_reused_subworkflow_aliases(self):
-        command = SimpleNamespace(id="tool", class_="CommandLineTool")
-        shared_workflow = SimpleNamespace(
+    def test_sequence_diagram_qualifies_reused_subworkflow_aliases(self) -> None:
+        command = CommandLineTool(id="tool", inputs=[], outputs=[])
+        shared_workflow = Workflow(
             id="shared",
-            class_="Workflow",
             label=None,
-            inputs=[SimpleNamespace(id="sub_in")],
+            inputs=[WorkflowInputParameter(id="sub_in", type_="string")],
             outputs=[],
             steps=[
-                SimpleNamespace(
+                WorkflowStep(
                     id="run-tool",
                     run="#tool",
                     in_=[
-                        SimpleNamespace(
+                        WorkflowStepInput(
                             id="leaf_in",
                             source="sub_in",
                             pickValue=None,
@@ -200,18 +196,17 @@ class TestHelpers(TestCase):
                 )
             ],
         )
-        root_workflow = SimpleNamespace(
+        root_workflow = Workflow(
             id="main",
-            class_="Workflow",
             label=None,
-            inputs=[SimpleNamespace(id="root_input")],
+            inputs=[WorkflowInputParameter(id="root_input", type_="string")],
             outputs=[],
             steps=[
-                SimpleNamespace(
+                WorkflowStep(
                     id="call-a",
                     run="#shared",
                     in_=[
-                        SimpleNamespace(
+                        WorkflowStepInput(
                             id="sub_in",
                             source="root_input",
                             pickValue=None,
@@ -222,11 +217,11 @@ class TestHelpers(TestCase):
                     scatter=None,
                     scatterMethod=None,
                 ),
-                SimpleNamespace(
+                WorkflowStep(
                     id="call-b",
                     run="#shared",
                     in_=[
-                        SimpleNamespace(
+                        WorkflowStepInput(
                             id="sub_in",
                             source="root_input",
                             pickValue=None,
@@ -262,35 +257,32 @@ class TestHelpers(TestCase):
             rendered,
         )
         self.assertIn(
-            'participant "step: run-tool\\nCommandLineTool: tool" as '
-            "main_or__call_a_or__run_tool",
+            'participant "step: run-tool\\nCommandLineTool: tool" as main_or__call_a_or__run_tool',
             rendered,
         )
         self.assertIn(
-            'participant "step: run-tool\\nCommandLineTool: tool" as '
-            "main_or__call_b_or__run_tool",
+            'participant "step: run-tool\\nCommandLineTool: tool" as main_or__call_b_or__run_tool',
             rendered,
         )
 
 
 class TestPlugin(TestCase):
-    def setUp(self):
-        workflow = SimpleNamespace(id="main")
-        self.context = SimpleNamespace(
-            document={"main": workflow},
-            process_id="main",
-            get_processes_by_type=lambda process_type, process_ids: [workflow],
-        )
+    def setUp(self) -> None:
+        workflow = Workflow(id="main", inputs=[], outputs=[], steps=[])
+        self.context = create_autospec(TranspilerContext, instance=True)
+        self.context.document = {"main": workflow}
+        self.context.process_id = "main"
+        self.context.get_processes_by_type.return_value = [workflow]
 
-    def test_plugin_writes_puml_output(self):
+    def test_plugin_writes_puml_output(self) -> None:
         with (
             TemporaryDirectory() as tmpdir,
             patch("cwl2puml.plugin.to_puml") as to_puml_mock,
         ):
             target = Path(tmpdir, "main", "component.puml")
             to_puml_mock.side_effect = (
-                lambda cwl_document, workflow_id, diagram_type, output_stream: (
-                    output_stream.write("@startuml\n@enduml\n")
+                lambda cwl_document, workflow_id, diagram_type, output_stream: output_stream.write(
+                    "@startuml\n@enduml\n"
                 )
             )
 
@@ -308,7 +300,7 @@ class TestPlugin(TestCase):
                 output_stream=to_puml_mock.call_args.kwargs["output_stream"],
             )
 
-    def test_plugin_writes_image_output_when_requested(self):
+    def test_plugin_writes_image_output_when_requested(self) -> None:
         response = type(
             "Response", (), {"status_code": 200, "content": b"svg-data", "reason": "OK"}
         )()
@@ -323,8 +315,8 @@ class TestPlugin(TestCase):
         ):
             target = Path(tmpdir, "main", "component.svg")
             to_puml_mock.side_effect = (
-                lambda cwl_document, workflow_id, diagram_type, output_stream: (
-                    output_stream.write("@startuml\n@enduml\n")
+                lambda cwl_document, workflow_id, diagram_type, output_stream: output_stream.write(
+                    "@startuml\n@enduml\n"
                 )
             )
 
@@ -344,7 +336,7 @@ class TestPlugin(TestCase):
             )
             self.assertEqual(target.read_bytes(), b"svg-data")
 
-    def test_plugin_raises_execution_error_on_render_error(self):
+    def test_plugin_raises_execution_error_on_render_error(self) -> None:
         response = type(
             "Response",
             (),
@@ -359,8 +351,8 @@ class TestPlugin(TestCase):
         ):
             target = Path(tmpdir, "main", "component.png")
             to_puml_mock.side_effect = (
-                lambda cwl_document, workflow_id, diagram_type, output_stream: (
-                    output_stream.write("@startuml\n@enduml\n")
+                lambda cwl_document, workflow_id, diagram_type, output_stream: output_stream.write(
+                    "@startuml\n@enduml\n"
                 )
             )
 
@@ -376,7 +368,7 @@ class TestPlugin(TestCase):
 
             self.assertFalse(target.exists())
 
-    def test_plugin_propagates_conversion_exceptions(self):
+    def test_plugin_propagates_conversion_exceptions(self) -> None:
         with (
             TemporaryDirectory() as tmpdir,
             patch("cwl2puml.plugin.to_puml", side_effect=RuntimeError("boom")),
@@ -385,24 +377,18 @@ class TestPlugin(TestCase):
             with self.assertRaises(PluginExecutionError) as raised:
                 plugin.execute(
                     self.context,
-                    Cwl2PumlOptions(
-                        diagrams=[DiagramType.COMPONENT], output=Path(tmpdir)
-                    ),
+                    Cwl2PumlOptions(diagrams=[DiagramType.COMPONENT], output=Path(tmpdir)),
                 )
 
             self.assertIsInstance(raised.exception.__cause__, RuntimeError)
             self.assertEqual(str(raised.exception.__cause__), "boom")
             self.assertFalse(target.exists())
 
-    def test_plugin_requires_a_resolved_process(self):
-        def fail_if_no_workflow(process_type, process_ids):
-            raise PluginExecutionError("No Workflow found")
-
-        context = SimpleNamespace(
-            document={},
-            process_id=None,
-            get_processes_by_type=fail_if_no_workflow,
-        )
+    def test_plugin_requires_a_resolved_process(self) -> None:
+        context = create_autospec(TranspilerContext, instance=True)
+        context.document = {}
+        context.process_id = None
+        context.get_processes_by_type.side_effect = PluginExecutionError("No Workflow found")
 
         with (
             TemporaryDirectory() as tmpdir,

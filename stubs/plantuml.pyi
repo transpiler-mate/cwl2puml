@@ -1,0 +1,3 @@
+"""Types for the PlantUML text encoder used by the plugin."""
+
+def deflate_and_encode(plantuml_text: str) -> str: ...

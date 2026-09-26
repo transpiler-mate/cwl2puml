@@ -31,7 +31,7 @@ repos:
 
   - id: ruff-format
     name: ruff (format)
-    entry: hatch run dev:lint
+    entry: hatch run dev:format-check
     language: system
     types_or:
     - python
@@ -41,7 +41,7 @@ repos:
 
   - id: ruff
     name: ruff (check and McCabe complexity)
-    entry: hatch run dev:check
+    entry: hatch run dev:lint-check
     language: system
     types_or:
     - python

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: package
+name: build-and-publish
 
 on:
   push:
@@ -31,9 +31,12 @@ on:
     - main
 
 permissions:
+  id-token: write
   contents: read
+  packages: write
 
 jobs:
+
   build:
     if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/') || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
@@ -48,10 +51,10 @@ jobs:
         - '3.14'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7.0.1
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7.0.0
       with:
         python-version: ${{ matrix.python-version }}
         cache: "pip"
@@ -88,30 +91,39 @@ jobs:
       run: hatch run dev:typecheck
 
     - name: ruff (format)
-      run: hatch run dev:lint
+      run: hatch run dev:format-check
 
     - name: ruff (check and McCabe complexity)
-      run: hatch run dev:check
+      run: hatch run dev:lint-check
 
     - name: bandit (find common security issues)
       run: hatch run dev:security
 
     - name: pytest (test coverage)
-      run: hatch run test:test-cov
+      run: hatch run +py=${{ matrix.python-version }} test:test-cov
+
+    - name: Upload coverage to Codecov
+      if: github.event_name == 'push' && matrix.python-version == '3.12'
+      uses: codecov/codecov-action@v7
+      with:
+        use_oidc: true
+        files: ./coverage.xml
+        disable_search: true
+        fail_ci_if_error: false
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
     runs-on: ubuntu-latest
     environment: release
+    needs: build
     permissions:
       id-token: write
       contents: read
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7.0.1
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v7.0.0
       with:
         python-version: '3.12'
         cache: pip
@@ -135,5 +147,5 @@ jobs:
     - name: Build package
       run: hatch build
 
-    - name: Publish package distributions to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.14.2

@@ -2,6 +2,8 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/cwl2puml.svg)](https://pypi.org/project/cwl2puml)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cwl2puml.svg)](https://pypi.org/project/cwl2puml)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/transpiler-mate/cwl2puml/package.yaml?branch=develop&event=push&label=build&logo=githubactions)](https://github.com/transpiler-mate/cwl2puml/actions/workflows/package.yaml?query=branch%3Adevelop)
+[![Code coverage](https://img.shields.io/codecov/c/github/transpiler-mate/cwl2puml/develop?logo=codecov)](https://app.codecov.io/gh/transpiler-mate/cwl2puml/tree/develop)
 
 `cwl2puml` converts [Common Workflow Language](https://www.commonwl.org/) workflows into [PlantUML](https://plantuml.com/) diagrams.
 

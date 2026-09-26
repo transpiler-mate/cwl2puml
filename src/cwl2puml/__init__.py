@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Render CWL process documents as PlantUML diagrams."""
+
 import json
 import re
 import time
@@ -118,9 +120,7 @@ def _type_to_ref(id: str, typ: Any) -> str:
 
 def _type_to_string(id: str, typ: Any) -> str:
     if get_origin(typ) in (Union, UnionType):
-        return " | ".join(
-            [_type_to_string(id, inner_type) for inner_type in get_args(typ)]
-        )
+        return " | ".join([_type_to_string(id, inner_type) for inner_type in get_args(typ)])
 
     if _a_list(typ):
         return " | ".join([_type_to_string(id, t) for t in typ])
@@ -155,15 +155,17 @@ def _get_version() -> str:
         return "N/A"
 
 
-def _dump_json(data: Mapping[str, Any]):
+def _dump_json(data: Mapping[str, object]) -> str:
     return json.dumps(data, indent=2)
 
 
-def get_ogc_inputs(process: Process):
+def get_ogc_inputs(process: Process) -> str:
+    """Serialize the process inputs as indented OGC API Processes JSON."""
     return _dump_json(BaseCWLtypes2OGCConverter(process).get_inputs())
 
 
-def get_ogc_outputs(process: Process):
+def get_ogc_outputs(process: Process) -> str:
+    """Serialize the process outputs as indented OGC API Processes JSON."""
     return _dump_json(BaseCWLtypes2OGCConverter(process).get_outputs())
 
 
@@ -202,9 +204,7 @@ _jinja_environment.filters.update(
         ]
     )
 )
-_jinja_environment.tests.update(
-    _to_mapping([_an_enum, _a_list, _a_string, _not_single_item_list])
-)
+_jinja_environment.tests.update(_to_mapping([_an_enum, _a_list, _a_string, _not_single_item_list]))
 
 # END
 
@@ -214,9 +214,8 @@ def to_puml(
     diagram_type: DiagramType,
     output_stream: TextIO,
     workflow_id: str = "main",
-):
-    """
-    Converts a CWL, given its document model, to a PlantUML diagram.
+) -> None:
+    """Convert a CWL, given its document model, to a PlantUML diagram.
 
     Args:
         cwl_document: The Processes object model representing the CWL document.
@@ -229,9 +228,7 @@ def to_puml(
     output_stream.write(
         template.render(
             version=_get_version(),
-            timestamp=datetime.fromtimestamp(time.time()).isoformat(
-                timespec="milliseconds"
-            ),
+            timestamp=datetime.fromtimestamp(time.time()).isoformat(timespec="milliseconds"),
             workflows=cwl_document.values(),
             workflow_id=workflow_id,
             index=cwl_document,
