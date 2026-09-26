@@ -78,8 +78,10 @@ files when image conversion is enabled. The default output directory is
 `./docs`; images are disabled by default. All seven diagram types are selected
 unless `--diagrams` is supplied.
 
-See the [plugin guide](docs/plugin.md) for all options and migration details,
-and the [API guide](docs/api.md) for Python usage.
+Start with the [first-diagram tutorial](docs/tutorials/first-diagram.md), or see
+the [command-line guide](docs/how-to/convert-workflows.md) and
+[Python guide](docs/how-to/use-python.md) for specific tasks. Options and API
+signatures are in the [reference](docs/reference/plugin.md).
 
 ## Development
 
