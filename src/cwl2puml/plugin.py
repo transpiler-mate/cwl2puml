@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Write CWL diagrams and optionally render images through a PlantUML server."""
+
 from __future__ import annotations
 
 from enum import Enum, auto
@@ -79,9 +81,7 @@ def cwl2puml(context: TranspilerContext, options: Cwl2PumlOptions) -> None:
             Workflow, [context.process_id] if context.process_id else None
         ):
             for diagram_type in options.diagrams:
-                logger.info(
-                    f"Converting to {diagram_type.name.lower()} PlantUML diagram..."
-                )
+                logger.info(f"Converting to {diagram_type.name.lower()} PlantUML diagram...")
                 out = StringIO()
                 to_puml(
                     cwl_document=context.document,
@@ -90,9 +90,7 @@ def cwl2puml(context: TranspilerContext, options: Cwl2PumlOptions) -> None:
                     output_stream=out,
                 )
 
-                target = Path(
-                    options.output, workflow.id, f"{diagram_type.name.lower()}.puml"
-                )
+                target = Path(options.output, workflow.id, f"{diagram_type.name.lower()}.puml")
                 target.parent.mkdir(parents=True, exist_ok=True)
 
                 clear_output = out.getvalue()

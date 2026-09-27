@@ -1,17 +1,36 @@
+# Copyright 2026 Terradue
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 [build-system]
-requires = ["hatchling==1.32.0"]
+requires = ["hatchling>=1.32.4"]
 build-backend = "hatchling.build"
 
 [project]
 name = "cwl2puml"
 dynamic = ["version"]
 description = 'CWL Worflows processor to generate PlantUML diagrams'
-
 readme = "README.md"
 requires-python = ">=3.10"
 license = "Apache-2.0"
-keywords = []
+license-files = ["LICENSE"]
+keywords = [
+  "cwl",
+  "commonwl",
+  "transpiler-mate"
+]
 authors = [
+  { name = "Terradue srl", email = "info@terradue.com" },
   { name = "Fabrice Brito", email = "info@terradue.com" },
   { name = "Simone Tripodi", email = "info@terradue.com"}
 ]
@@ -27,24 +46,60 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "cwl2ogc>=0.20.0",
+  "cwl2ogc>=0.22.1",
   "Jinja2==3.1.6",
   "loguru==0.7.3",
   "plantuml==0.3.0",
+  # plantuml imports six but does not declare it as a dependency.
+  "six>=1.16.0",
   "requests",
-  "transpiler-mate-api==1.0.0",
+  "transpiler-mate-api>=1.0.0",
 ]
+
+# ---------------------------------------------------------------------------
+# Transpiler Mate plugin entry point
+# ---------------------------------------------------------------------------
 
 [project.entry-points."transpiler_mate.plugins"]
 cwl2puml = "cwl2puml.plugin:cwl2puml"
 
+# ---------------------------------------------------------------------------
+# Project Refs
+# ---------------------------------------------------------------------------
+
 [project.urls]
+Homepage = "https://github.com/Transpiler-Mate/cwl2puml"
 Documentation = "https://Transpiler-Mate.github.io/cwl2puml/"
+Repository = "https://github.com/Transpiler-Mate/cwl2puml"
 Issues = "https://github.com/Transpiler-Mate/cwl2puml/issues"
-Source = "https://github.com/Transpiler-Mate/cwl2puml"
+Changelog = "https://github.com/Transpiler-Mate/cwl2puml/blob/main/CHANGELOG.md"
+
+# ---------------------------------------------------------------------------
+# Versioning and packaging
+# ---------------------------------------------------------------------------
 
 [tool.hatch.version]
 path = "src/cwl2puml/__about__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests",
+  "/stubs",
+  "/docs",
+  "/README.md",
+  "/CHANGELOG.md",
+  "/LICENSE",
+  "/NOTICE",
+  "/pyproject.toml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cwl2puml"]
+
+# ---------------------------------------------------------------------------
+# Coverage
+# ---------------------------------------------------------------------------
 
 [tool.coverage.run]
 source_pkgs = ["cwl2puml", "tests"]
@@ -55,96 +110,220 @@ omit = [
 ]
 
 [tool.coverage.paths]
-cwl2puml = ["src/cwl2puml", "*/cwl2puml/src/cwl2puml"]
-tests = ["tests", "*/cwl2puml/tests"]
+cwl2puml = [
+  "src/cwl2puml",
+  "*/cwl2puml/src/cwl2puml"
+]
 
 [tool.coverage.report]
+show_missing = true
+skip_covered = false
+
 exclude_lines = [
   "no cov",
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
+  "raise NotImplementedError",
 ]
+
+# ---------------------------------------------------------------------------
+# Hatch: test environment
+# ---------------------------------------------------------------------------
 
 [tool.hatch.envs.test]
 skip-install = false
 dependencies = [
-  "cwl-loader>=0.25.0",
-  "pytest>=8.4,<10",
-  "pytest-cov>=6.2,<8",
-  "cwltool>=3.2.20260720092025"
+  "cwl-loader>=0.27.0",
+  "click>=8.4.2,<9",
+  "pytest>=9.1.1,<10",
+  "pytest-cov>=7.1.0,<8",
 ]
 
 [tool.hatch.envs.test.scripts]
 test = "pytest {args:tests}"
 testv = "pytest --verbose {args:tests}"
-test-cov = "pytest --cov=cwl2puml --cov-report=term-missing {args:tests}"
-test-show-setup = "pytest --setup-show"
+test-cov = "pytest --cov=cwl2puml --cov-report=term-missing --cov-report=xml:coverage.xml {args:tests}"
+test-show-setup = "pytest --setup-show {args:tests}"
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
 addopts = [
   "--strict-config",
   "--strict-markers",
 ]
 
-[[tool.hatch.envs.test.matrix]]
-python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+xfail_strict = true
 
-
-[tool.hatch.envs.default]
-skip-install = false
+# ---------------------------------------------------------------------------
+# Hatch: development and quality environment
+# ---------------------------------------------------------------------------
 
 [tool.hatch.envs.dev]
 skip-install = false
 dependencies = [
-  "transpiler-mate-api @ git+https://github.com/sim13pods/transpiler-mate-api.git@main",
   "mypy>=2.3.0",
+  "types-jsonschema>=4.26.0.20260518",
   "ruff>=0.16.0",
   "bandit>=1.9.4",
+  "cwl-loader>=0.27.0",
+  "click>=8.4.2,<9",
+  "pytest>=9.1.1,<10",
 ]
+
+# ---------------------------------------------------------------------------
+# Ruff
+# ---------------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
 
 [tool.ruff.lint]
 # Start with the essential rules
 select = [
-  "F",    # Pyflakes (Critical for bugs)
-  "E",    # pycodestyle Errors
-  "W",    # pycodestyle Warnings
-  "I",    # isort (Import sorting)
-  "UP",   # pyupgrade (Modern syntax)
-  "B",    # flake8-bugbear (Common bugs)
-  "C4",   # flake8-comprehensions
-  "SIM",  # flake8-simplify
-  "FA",   # flake8-future-annotations
-  "TC",   # flake8-type-checking
-  "PTH",  # flake8-use-pathlib
-  "RET",  # flake8-return
-  "C90",  # McCabe Complexity (Enables C901)
+  # Core correctness
+  "F",      # Pyflakes
+  "E",      # pycodestyle errors
+  "W",      # pycodestyle warnings
+
+  # Imports and modernization
+  "I",      # isort
+  "UP",     # pyupgrade
+  "FA",     # future annotations
+  "TC",     # type-checking imports
+
+  # Bugs and correctness
+  "B",      # flake8-bugbear
+  "RET",    # flake8-return
+  "PTH",    # pathlib usage
+  "C4",     # comprehensions
+
+  # Simplification and readability
+  "SIM",    # flake8-simplify
+
+  # Complexity
+  "C90",    # McCabe complexity
+
+  # Pylint-derived checks
+  "PLE",    # Pylint errors
+  "PLW",    # Pylint warnings
+  "PLR",    # Pylint refactor/design checks
+
+  # Performance and Ruff-specific quality checks
+  "PERF",
+  "RUF",
 ]
 
-# Ignore rules that conflict with the formatter (Ruff Format/Black)
 ignore = [
-  "E501", # Line too long (handled by formatter)
-  "W191", # Tab indentation (handled by formatter)
-  "E111", # Indentation issues (handled by formatter)
-  "E114", # Indentation issues (handled by formatter)
-  "E117", # Over-indented (handled by formatter)
+  # Formatter-controlled rules
+  "E501",   # line length
+  "W191",   # tab indentation
+  "E111",   # indentation
+  "E114",   # indentation
+  "E117",   # over-indented
+
+  # Too opinionated for a general project template.
+  # Enable per repository if useful.
+  # "PLR0904", # too many public methods
 ]
 
 [tool.ruff.lint.mccabe]
 # Flag errors (C901) whenever complexity exceeds 10 (default is 10)
-max-complexity = 10
+max-complexity = 7
+
+[tool.ruff.lint.pylint]
+# Keep these deliberately stricter than Pylint defaults.
+max-args = 6
+max-branches = 10
+max-returns = 6
+max-statements = 40
+
+# ---------------------------------------------------------------------------
+# Mypy
+# ---------------------------------------------------------------------------
+
+[tool.mypy]
+
+# Strict typing is the default for new Terradue Python projects.
+strict = true
+
+# Improve diagnostics.
+pretty = true
+show_error_codes = true
+show_error_context = true
+warn_unreachable = true
+
+# Avoid silently accepting untyped third-party APIs.
+ignore_missing_imports = false
+
+# Files checked by default.
+files = [
+  "src/cwl2puml",
+  "tests",
+]
+
+# Describe only the untyped third-party APIs used by this package.
+mypy_path = "$MYPY_CONFIG_FILE_DIR/stubs"
 
 [tool.hatch.envs.dev.scripts]
-typecheck = "mypy --install-types --non-interactive {args:src tests}"
-lint = "ruff format {args:src tests}"
-check = "ruff check --fix {args:src tests}"
+# ---------------------------------------------------------------------------
+# Developer commands
+#
+# These commands are allowed to modify files.
+# ---------------------------------------------------------------------------
+
+format = "ruff format {args:src tests stubs}"
+
+fix = [
+  "ruff check --fix {args:src tests stubs}",
+  "ruff format {args:src tests stubs}",
+]
+
+# ---------------------------------------------------------------------------
+# Verification commands
+#
+# These commands MUST NOT modify files and are suitable for CI.
+# ---------------------------------------------------------------------------
+
+format-check = "ruff format --check {args:src tests stubs}"
+
+lint = "ruff check {args:src tests stubs}"
+lint-check = "ruff check {args:src tests stubs}"
+design-check = "ruff check --select C90,PLR {args:src tests}"
+
+typecheck = "mypy {args:src tests}"
+
 security = "bandit -r {args:src}"
 
-[[tool.mypy.overrides]]
-module = [
-  "cwl2ogc",
-  "cwl_loader",
-  "cwl_loader.*",
-  "plantuml",
+# Run the complete static quality gate.
+quality = [
+  "ruff format --check {args:src tests stubs}",
+  "ruff check {args:src tests stubs}",
+  "mypy {args:src tests}",
+  "bandit -r {args:src}",
 ]
-ignore_missing_imports = true
+
+# Complete local/CI validation including tests.
+check = [
+  "ruff format --check {args:src tests stubs}",
+  "ruff check {args:src tests stubs}",
+  "mypy {args:src tests}",
+  "bandit -r {args:src}",
+  "pytest {args:tests}",
+]
+
+# Preserve editable-install test extras and uv's local wheel resolution.
+[project.optional-dependencies]
+test = [
+  "cwl-loader>=0.27.0",
+  "click>=8.4.2,<9",
+  "pytest>=9.1.1,<10",
+  "pytest-cov>=7.1.0,<8"
+]

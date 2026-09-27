@@ -79,9 +79,18 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 nav:
-  - Introduction: index.md
-  - Transpiler-Mate plugin: plugin.md
-  - API doc: api.md
-  - Examples: examples.ipynb
+  - Home: index.md
+  - Tutorials:
+      - Your first diagram: tutorials/first-diagram.md
+      - Explore workflow diagrams: tutorials/examples.ipynb
+  - How-to guides:
+      - Convert workflows: how-to/convert-workflows.md
+      - Render with Python: how-to/use-python.md
+      - Migrate the CLI: how-to/migrate-cli.md
+  - Reference:
+      - Command-line plugin: reference/plugin.md
+      - Python API: reference/api.md
+  - Explanation:
+      - How conversion works: explanation/conversion.md
 
 copyright: <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a>
