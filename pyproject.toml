@@ -46,7 +46,7 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "cwl2ogc>=0.20.0",
+  "cwl2ogc>=0.22.1",
   "Jinja2==3.1.6",
   "loguru==0.7.3",
   "plantuml==0.3.0",
@@ -135,8 +135,8 @@ skip-install = false
 dependencies = [
   "cwl-loader>=0.27.0",
   "click>=8.4.2,<9",
-  "pytest>=8.4,<10",
-  "pytest-cov>=6.2,<8",
+  "pytest>=9.1.1,<10",
+  "pytest-cov>=7.1.0,<8",
 ]
 
 [tool.hatch.envs.test.scripts]
@@ -175,7 +175,7 @@ dependencies = [
   "bandit>=1.9.4",
   "cwl-loader>=0.27.0",
   "click>=8.4.2,<9",
-  "pytest>=8.4,<10",
+  "pytest>=9.1.1,<10",
 ]
 
 # ---------------------------------------------------------------------------
@@ -324,6 +324,6 @@ check = [
 test = [
   "cwl-loader>=0.27.0",
   "click>=8.4.2,<9",
-  "pytest>=8.4,<10",
-  "pytest-cov>=6.2,<8"
+  "pytest>=9.1.1,<10",
+  "pytest-cov>=7.1.0,<8"
 ]
