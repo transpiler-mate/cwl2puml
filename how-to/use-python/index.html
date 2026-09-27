@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://Transpiler-Mate.github.io/cwl2puml/how-to/use-python/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Render with Python - CWL to PlantUML</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../styles/css/app.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Render with Python";
+        var mkdocs_page_input_path = "how-to/use-python.md";
+        var mkdocs_page_url = "/cwl2puml/how-to/use-python/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/first-diagram/">Your first diagram</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/examples/">Explore workflow diagrams</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../convert-workflows/">Convert workflows</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Render with Python</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#render-a-workflow">Render a workflow</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#export-ogc-process-inputs-and-outputs">Export OGC process inputs and outputs</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../migrate-cli/">Migrate the CLI</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/plugin/">Command-line plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/api/">Python API</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../explanation/conversion/">How conversion works</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">CWL to PlantUML</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">How-to guides</li>
+      <li class="breadcrumb-item active">Render with Python</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/edit/master/docs/how-to/use-python.md">Edit on Transpiler-Mate/cwl2puml</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="render-diagrams-and-export-json-with-python">Render diagrams and export JSON with Python</h1>
+<p>Use this guide to integrate conversion into an application with an existing CWL file.</p>
+<h2 id="render-a-workflow">Render a workflow</h2>
+<p>Install the library and loader in the same environment:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1">pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"cwl2puml&gt;=0.48.0"</span><span class="w"> </span>cwl-loader
+</span></code></pre></div>
+<p>Load and index a CWL document before rendering it:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+</span><span id="__span-1-2"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="__span-1-3">
+</span><span id="__span-1-4"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_cwl_from_location</span>
+</span><span id="__span-1-5"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl_loader.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_index</span>
+</span><span id="__span-1-6"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl2puml</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiagramType</span><span class="p">,</span> <span class="n">to_puml</span>
+</span><span id="__span-1-7">
+</span><span id="__span-1-8"><span class="n">processes</span> <span class="o">=</span> <span class="n">load_cwl_from_location</span><span class="p">(</span><span class="s2">"workflow.cwl"</span><span class="p">)</span>
+</span><span id="__span-1-9"><span class="n">index</span> <span class="o">=</span> <span class="n">to_index</span><span class="p">(</span><span class="n">processes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">processes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">processes</span><span class="p">])</span>
+</span><span id="__span-1-10">
+</span><span id="__span-1-11"><span class="n">output</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+</span><span id="__span-1-12"><span class="n">to_puml</span><span class="p">(</span>
+</span><span id="__span-1-13">    <span class="n">cwl_document</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+</span><span id="__span-1-14">    <span class="n">workflow_id</span><span class="o">=</span><span class="s2">"main"</span><span class="p">,</span>
+</span><span id="__span-1-15">    <span class="n">diagram_type</span><span class="o">=</span><span class="n">DiagramType</span><span class="o">.</span><span class="n">COMPONENT</span><span class="p">,</span>
+</span><span id="__span-1-16">    <span class="n">output_stream</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+</span><span id="__span-1-17"><span class="p">)</span>
+</span><span id="__span-1-18"><span class="n">Path</span><span class="p">(</span><span class="s2">"component.puml"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>cwl_document</code> is a mapping of process IDs to CWL process objects, not raw YAML
+or a filename. Keep the referenced tools and subworkflows in the mapping.
+<code>workflow_id</code> defaults to <code>"main"</code>; choose the ID present in your loaded index.
+<code>to_puml()</code> writes source to the supplied text stream and returns <code>None</code>.
+The caller owns the stream and any file creation or image rendering.</p>
+<h2 id="export-ogc-process-inputs-and-outputs">Export OGC process inputs and outputs</h2>
+<p><code>get_ogc_inputs(process)</code> and <code>get_ogc_outputs(process)</code> return indented JSON
+<strong>strings</strong>, using <code>BaseCWLtypes2OGCConverter</code> from <code>cwl2ogc</code>:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl2puml</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_ogc_inputs</span><span class="p">,</span> <span class="n">get_ogc_outputs</span>
+</span><span id="__span-2-2">
+</span><span id="__span-2-3"><span class="n">process</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s2">"main"</span><span class="p">]</span>
+</span><span id="__span-2-4"><span class="n">Path</span><span class="p">(</span><span class="s2">"inputs.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">get_ogc_inputs</span><span class="p">(</span><span class="n">process</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="__span-2-5"><span class="n">Path</span><span class="p">(</span><span class="s2">"outputs.json"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">get_ogc_outputs</span><span class="p">(</span><span class="n">process</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Use <code>DiagramType.OGC_PROCESSES_INPUTS</code> or
+<code>DiagramType.OGC_PROCESSES_OUTPUTS</code> with <code>to_puml()</code> to wrap these descriptions
+in a PlantUML JSON diagram instead.</p>
+<p>See the <a href="../../reference/api/">API reference</a> for callable signatures.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../convert-workflows/" class="btn btn-neutral float-left" title="Convert workflows"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../migrate-cli/" class="btn btn-neutral float-right" title="Migrate the CLI">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/" class="fa fa-code-fork" style="color: #fcfcfc"> Transpiler-Mate/cwl2puml</a>
+        </span>
+    
+    
+      <span><a href="../convert-workflows/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../migrate-cli/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/config.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://Transpiler-Mate.github.io/cwl2puml/explanation/conversion/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>How conversion works - CWL to PlantUML</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../styles/css/app.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "How conversion works";
+        var mkdocs_page_input_path = "explanation/conversion.md";
+        var mkdocs_page_url = "/cwl2puml/explanation/conversion/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/first-diagram/">Your first diagram</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../tutorials/examples/">Explore workflow diagrams</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/convert-workflows/">Convert workflows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/use-python/">Render with Python</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/migrate-cli/">Migrate the CLI</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/plugin/">Command-line plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/api/">Python API</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">How conversion works</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#loading-conversion-and-rendering">Loading, conversion, and rendering</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-the-complete-process-index-matters">Why the complete process index matters</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#different-views-of-the-same-workflow">Different views of the same workflow</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">CWL to PlantUML</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Explanation</li>
+      <li class="breadcrumb-item active">How conversion works</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/edit/master/docs/explanation/conversion.md">Edit on Transpiler-Mate/cwl2puml</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="how-cwl-becomes-a-diagram">How CWL becomes a diagram</h1>
+<h2 id="loading-conversion-and-rendering">Loading, conversion, and rendering</h2>
+<p>Conversion starts from loaded CWL process objects. The transpiler-mate runtime
+loads the source, validates application metadata, and supplies a
+<code>TranspilerContext</code> containing the document and optional process ID. The plugin
+selects workflows and passes the document to the diagram converter.</p>
+<p>The Python <code>to_puml()</code> function renders a Jinja template and writes PlantUML
+source to a caller-owned text stream. It does not load CWL, execute workflow
+steps, create output directories, or request images. Keeping these operations
+separate lets applications choose their loader, output destination, and renderer.</p>
+<p>The plugin adds file output and optional requests to a PlantUML server. A <code>.puml</code>
+file is the diagram source; PNG and SVG files are rendered views of that source.
+When image conversion is enabled, the encoded diagram is sent to the configured
+server. Source generation alone does not require that server.</p>
+<h2 id="why-the-complete-process-index-matters">Why the complete process index matters</h2>
+<p>A workflow can reference tools and subworkflows. Templates use the document's
+process index to resolve these references. Selecting a workflow ID chooses the
+root diagram; it does not remove its dependencies from the index. This is why
+Python callers should retain all loaded processes when constructing the mapping.</p>
+<p>Nested workflows are particularly visible in sequence diagrams, which show
+interactions within each invocation. Separate invocation aliases distinguish
+multiple calls to the same subworkflow.</p>
+<h2 id="different-views-of-the-same-workflow">Different views of the same workflow</h2>
+<p>Activity diagrams emphasize steps and control flow. Component diagrams show
+connections between workflow components, while class diagrams focus on inputs,
+outputs, and their types. Sequence diagrams emphasize interactions and nested
+workflow calls. State diagrams show input/output dependencies.</p>
+<p>The two OGC diagram types describe process inputs or outputs as JSON, using
+<code>cwl2ogc</code> to perform the conversion. They wrap that JSON in PlantUML JSON blocks.
+They are descriptions of a process interface rather than workflow execution views.</p>
+<p>See the <a href="../../reference/plugin/#supported-diagrams">diagram reference</a> for the
+exact option names, or explore the <a href="../../tutorials/examples/">notebook</a> to
+compare the five workflow views.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../reference/api/" class="btn btn-neutral float-left" title="Python API"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/" class="fa fa-code-fork" style="color: #fcfcfc"> Transpiler-Mate/cwl2puml</a>
+        </span>
+    
+    
+      <span><a href="../../reference/api/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/config.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

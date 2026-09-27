@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Fabrice Brito, Simone Tripodi" /><link rel="canonical" href="https://Transpiler-Mate.github.io/cwl2puml/tutorials/first-diagram/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Your first diagram - CWL to PlantUML</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../styles/css/app.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Your first diagram";
+        var mkdocs_page_input_path = "tutorials/first-diagram.md";
+        var mkdocs_page_url = "/cwl2puml/tutorials/first-diagram/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../imgs/icon-eoap.png" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Your first diagram</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-prepare-an-environment">1. Prepare an environment</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-create-a-workflow">2. Create a workflow</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-generate-diagram-source">3. Generate diagram source</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-inspect-the-result">4. Inspect the result</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../examples/">Explore workflow diagrams</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">How-to guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/convert-workflows/">Convert workflows</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/use-python/">Render with Python</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../how-to/migrate-cli/">Migrate the CLI</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/plugin/">Command-line plugin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../reference/api/">Python API</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Explanation</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../explanation/conversion/">How conversion works</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">CWL to PlantUML</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Tutorials</li>
+      <li class="breadcrumb-item active">Your first diagram</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/edit/master/docs/tutorials/first-diagram.md">Edit on Transpiler-Mate/cwl2puml</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="create-your-first-diagram">Create your first diagram</h1>
+<p>In this tutorial, you will create a small CWL workflow and turn it into a
+PlantUML component diagram using Python. You need Python 3.10 or later and a
+terminal. You will generate diagram source without running the workflow.</p>
+<h2 id="1-prepare-an-environment">1. Prepare an environment</h2>
+<p>Create an empty working directory and run:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1">python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+</span><span id="__span-0-2"><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</span><span id="__span-0-3">python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"cwl2puml&gt;=0.48.0"</span><span class="w"> </span><span class="s2">"cwl-loader&gt;=0.27.0"</span>
+</span></code></pre></div>
+<p>On Windows, activate the environment with <code>.venv\Scripts\activate</code> instead.</p>
+<h2 id="2-create-a-workflow">2. Create a workflow</h2>
+<p>Save this document as <code>workflow.cwl</code>:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><span class="nt">cwlVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1.2</span>
+</span><span id="__span-1-2"><span class="nt">$graph</span><span class="p">:</span>
+</span><span id="__span-1-3"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CommandLineTool</span>
+</span><span id="__span-1-4"><span class="w">    </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo</span>
+</span><span id="__span-1-5"><span class="w">    </span><span class="nt">baseCommand</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo</span>
+</span><span id="__span-1-6"><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+</span><span id="__span-1-7"><span class="w">      </span><span class="nt">message</span><span class="p">:</span>
+</span><span id="__span-1-8"><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+</span><span id="__span-1-9"><span class="w">        </span><span class="nt">inputBinding</span><span class="p">:</span>
+</span><span id="__span-1-10"><span class="w">          </span><span class="nt">position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-1-11"><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+</span><span id="__span-1-12"><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">class</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Workflow</span>
+</span><span id="__span-1-13"><span class="w">    </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">main</span>
+</span><span id="__span-1-14"><span class="w">    </span><span class="nt">inputs</span><span class="p">:</span>
+</span><span id="__span-1-15"><span class="w">      </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">string</span>
+</span><span id="__span-1-16"><span class="w">    </span><span class="nt">outputs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+</span><span id="__span-1-17"><span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+</span><span id="__span-1-18"><span class="w">      </span><span class="nt">greet</span><span class="p">:</span>
+</span><span id="__span-1-19"><span class="w">        </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="s">'#echo'</span>
+</span><span id="__span-1-20"><span class="w">        </span><span class="nt">in</span><span class="p">:</span>
+</span><span id="__span-1-21"><span class="w">          </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">message</span>
+</span><span id="__span-1-22"><span class="w">        </span><span class="nt">out</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+</span></code></pre></div>
+<p>The workflow has one input, <code>message</code>, and one step, <code>greet</code>, that uses the
+<code>echo</code> tool. Both processes are present in the document.</p>
+<h2 id="3-generate-diagram-source">3. Generate diagram source</h2>
+<p>Save the following as <code>render.py</code> in the same directory:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-2-1"><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+</span><span id="__span-2-2"><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="__span-2-3">
+</span><span id="__span-2-4"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_cwl_from_location</span>
+</span><span id="__span-2-5"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl_loader.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_index</span>
+</span><span id="__span-2-6"><span class="kn">from</span><span class="w"> </span><span class="nn">cwl2puml</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiagramType</span><span class="p">,</span> <span class="n">to_puml</span>
+</span><span id="__span-2-7">
+</span><span id="__span-2-8"><span class="n">processes</span> <span class="o">=</span> <span class="n">load_cwl_from_location</span><span class="p">(</span><span class="s2">"workflow.cwl"</span><span class="p">)</span>
+</span><span id="__span-2-9"><span class="n">index</span> <span class="o">=</span> <span class="n">to_index</span><span class="p">(</span><span class="n">processes</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">processes</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">processes</span><span class="p">])</span>
+</span><span id="__span-2-10"><span class="n">output</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+</span><span id="__span-2-11"><span class="n">to_puml</span><span class="p">(</span>
+</span><span id="__span-2-12">    <span class="n">cwl_document</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+</span><span id="__span-2-13">    <span class="n">workflow_id</span><span class="o">=</span><span class="s2">"main"</span><span class="p">,</span>
+</span><span id="__span-2-14">    <span class="n">diagram_type</span><span class="o">=</span><span class="n">DiagramType</span><span class="o">.</span><span class="n">COMPONENT</span><span class="p">,</span>
+</span><span id="__span-2-15">    <span class="n">output_stream</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+</span><span id="__span-2-16"><span class="p">)</span>
+</span><span id="__span-2-17"><span class="n">Path</span><span class="p">(</span><span class="s2">"component.puml"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span>
+</span><span id="__span-2-18"><span class="nb">print</span><span class="p">(</span><span class="s2">"Created component.puml"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Run it:</p>
+<div class="highlight"><pre><span></span><code><span id="__span-3-1">python<span class="w"> </span>render.py
+</span></code></pre></div>
+<p>After the loader messages, you should see <code>Created component.puml</code>.</p>
+<h2 id="4-inspect-the-result">4. Inspect the result</h2>
+<p>Open <code>component.puml</code> in a text editor. It contains <code>@startuml</code> and <code>@enduml</code>
+boundaries, a workflow component named <code>main</code>, an input named <code>message</code>, and a
+frame for the <code>greet</code> step. A PlantUML viewer can render this source as an image.</p>
+<p>You have converted a local CWL document into diagram source. Continue with the
+<a href="../examples/">example notebook</a> to explore other diagram types, or use the
+<a href="../../how-to/convert-workflows/">command-line guide</a> to generate images through
+the plugin.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../.." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../examples/" class="btn btn-neutral float-right" title="Explore workflow diagrams">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/license-Apache%20License%202.0-blue"" alt="Apache License, Version 2.0" /></a></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Transpiler-Mate/cwl2puml/" class="fa fa-code-fork" style="color: #fcfcfc"> Transpiler-Mate/cwl2puml</a>
+        </span>
+    
+    
+      <span><a href="../.." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../examples/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../javascripts/config.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
