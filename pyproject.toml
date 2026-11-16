@@ -48,7 +48,7 @@ classifiers = [
 dependencies = [
   "cwl2ogc>=0.22.1",
   "Jinja2==3.1.6",
-  "loguru==0.7.3",
+  "loguru==0.8.0",
   "plantuml==0.3.0",
   # plantuml imports six but does not declare it as a dependency.
   "six>=1.16.0",
